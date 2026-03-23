@@ -1,0 +1,121 @@
+package ph.edu.cksc.college.appdev.mydiary
+
+import android.annotation.SuppressLint
+import android.os.Build
+import android.os.Bundle
+import android.util.Log
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.annotation.RequiresApi
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import ph.edu.cksc.college.appdev.mydiary.components.DiaryEntryViewModel
+import ph.edu.cksc.college.appdev.mydiary.diary.DiaryEntry
+import ph.edu.cksc.college.appdev.mydiary.screens.AboutScreen
+import ph.edu.cksc.college.appdev.mydiary.screens.AccountScreen
+import ph.edu.cksc.college.appdev.mydiary.screens.DiaryEntryScreen
+import ph.edu.cksc.college.appdev.mydiary.screens.LoginScreen
+import ph.edu.cksc.college.appdev.mydiary.screens.MainScreen
+import ph.edu.cksc.college.appdev.mydiary.screens.RegistrationScreen
+import ph.edu.cksc.college.appdev.mydiary.ui.theme.MyDiaryTheme
+import java.time.LocalDateTime
+
+class MainActivity : ComponentActivity() {
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContent {
+            MyDiaryTheme {
+                AppNavigation()
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Composable
+    fun AppNavigation() {
+        val navController = rememberNavController()
+        val viewModel = object: DiaryEntryViewModel {
+            @SuppressLint("UnrememberedMutableState")
+            override var diaryEntry = mutableStateOf(DiaryEntry())
+            init {
+                diaryEntry.value = DiaryEntry(
+                    "",
+                    0,
+                    5,
+                    "Lexi",
+                    "Test...Test...Test...",
+                    LocalDateTime.of(2024, 1, 1, 7, 30).toString()
+                )
+            }
+            override var modified: Boolean = false
+
+            override fun onTitleChange(newValue: String) {
+                diaryEntry.value = diaryEntry.value.copy(title = newValue)
+                modified = true
+            }
+            override fun onContentChange(newValue: String) {
+                diaryEntry.value = diaryEntry.value.copy(content = newValue)
+                modified = true
+            }
+            override fun onMoodChange(newValue: Int) {
+                diaryEntry.value = diaryEntry.value.copy(mood = newValue)
+                modified = true
+            }
+            override fun onStarChange(newValue: Int) {
+                diaryEntry.value = diaryEntry.value.copy(star = newValue)
+                modified = true
+            }
+            override fun onDateTimeChange(newValue: LocalDateTime) {
+                val newDueDate = newValue.toString()
+                diaryEntry.value = diaryEntry.value.copy(dateTime = newDueDate)
+                modified = true
+            }
+            override fun onDoneClick(popUpScreen: () -> Unit) {
+                if (diaryEntry.value.id == "") {
+                    SampleDiaryEntries.entries.add(diaryEntry.value)
+                } else {
+                    var index = 0
+                    for (entry in SampleDiaryEntries.entries) {
+                        if (entry.id == diaryEntry.value.id) {
+                            break
+                        }
+                        index++
+                    }
+                    SampleDiaryEntries.entries[index] = diaryEntry.value
+                }
+                navController.popBackStack()
+            }
+        }
+        NavHost(navController = navController, startDestination = ACCOUNT_SCREEN) {
+            composable(ACCOUNT_SCREEN) { AccountScreen(navController = navController) }
+            composable(MAIN_SCREEN) { MainScreen(navController = navController) }
+            composable(ABOUT_SCREEN) { AboutScreen(navController = navController) }
+            composable(LOGIN_SCREEN) { LoginScreen(navController = navController) }
+            composable(REGISTRATION_SCREEN) { RegistrationScreen(navController = navController) }
+            composable("$DIARY_ENTRY_SCREEN/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val arguments = requireNotNull(backStackEntry.arguments)
+                val id = arguments.getString("id") ?: "1"
+                Log.d("Test", "id: " + id)
+                for (entry in SampleDiaryEntries.entries) {
+                    if (entry.id == id) {
+                        viewModel.diaryEntry = mutableStateOf(entry)
+                        break
+                    }
+                }
+                //viewModel.diaryEntry
+                //val viewModel: DiaryEntryViewModel = hiltViewModel()
+                DiaryEntryScreen(navController = navController, viewModel = viewModel)
+            }
+        }
+    }
+}
