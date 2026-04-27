@@ -16,4 +16,6 @@ interface RegisterViewModel {
     fun onPasswordChange(newValue: String)
 
     fun onRetypePasswordChange(newValue: String)
+
+    suspend fun register(): String
 }

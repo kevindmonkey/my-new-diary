@@ -9,7 +9,11 @@ interface LoginViewModel {
 
     var modified: Boolean
 
+    var loginError: String
+
     fun onEmailChange(newValue: String)
 
     fun onPasswordChange(newValue: String)
+
+    suspend fun login(): String
 }

@@ -1,8 +1,6 @@
 package ph.edu.cksc.college.appdev.mydiary.components
 
 import android.annotation.SuppressLint
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +15,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -25,17 +24,20 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ph.edu.cksc.college.appdev.mydiary.diary.Login
-import ph.edu.cksc.college.appdev.mydiary.diary.Registration
 import ph.edu.cksc.college.appdev.mydiary.ui.theme.MyDiaryTheme
 
 @Composable
 fun LoginComponent(
     viewModel: LoginViewModel,
+    onCancel: () -> Unit,
     test: Boolean
 ) {
     val entry by viewModel.account
     var error by rememberSaveable { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier.fillMaxSize().padding(4.dp),
@@ -65,7 +67,7 @@ fun LoginComponent(
             OutlinedButton(
                 modifier = Modifier.padding(8.dp),
                 onClick = {
-                    // TODO
+                    onCancel()
                 }
             ) {
                 Text("Cancel")
@@ -76,17 +78,23 @@ fun LoginComponent(
                     error = ""
                     if (entry.password.isEmpty() || entry.email.isEmpty()) {
                         error = "Email and Password are required"
+                    } else {
+                        scope.launch(Dispatchers.IO) {
+                            val result = viewModel.login()
+                            if (result != "Success") {
+                                error = result
+                            }
+                        }
                     }
                 }
             ) {
                 Text("Login")
             }
         }
-        Text(color = Color.Red, text = error)
+        Text(color = Color.Red, text = viewModel.loginError + error)
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Preview(showBackground = true)
 @Composable
 fun LoginComponentPreview() {
@@ -97,6 +105,7 @@ fun LoginComponentPreview() {
                 override var account = mutableStateOf(Login())
 
                 override var modified: Boolean = true
+                override var loginError: String = ""
 
                 override fun onEmailChange(newValue: String) {
                     account.value = account.value.copy(email = newValue)
@@ -105,8 +114,15 @@ fun LoginComponentPreview() {
                 override fun onPasswordChange(newValue: String) {
                     account.value = account.value.copy(password = newValue)
                 }
+
+                override suspend fun login(): String {
+                    return "Success"
+                }
             },
-            test = true
+            test = true,
+            onCancel = {
+
+            }
         )
     }
 }

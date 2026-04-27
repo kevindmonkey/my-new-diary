@@ -17,6 +17,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -25,19 +26,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ph.edu.cksc.college.appdev.mydiary.diary.Registration
 import ph.edu.cksc.college.appdev.mydiary.ui.theme.MyDiaryTheme
 
 @Composable
 fun RegisterComponent (
     viewModel: RegisterViewModel,
+    onCancel: () -> Unit,
     test: Boolean
 ) {
     val entry by viewModel.account
     var error by rememberSaveable { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(4.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(4.dp),
     ) {
         OutlinedTextField(
             modifier = Modifier.fillMaxWidth(),
@@ -82,7 +89,7 @@ fun RegisterComponent (
             OutlinedButton(
                 modifier = Modifier.padding(8.dp),
                 onClick = {
-                    // TODO
+                    onCancel()
                 }
             ) {
                 Text("Cancel")
@@ -91,8 +98,17 @@ fun RegisterComponent (
                 modifier = Modifier.padding(8.dp),
                 onClick = {
                     error = ""
-                    if (entry.password != entry.retypePassword) {
+                    if (entry.name == "" || entry.email == "") {
+                        error = "Name and email are required"
+                    } else if (entry.password != entry.retypePassword) {
                         error = "Password didn't match"
+                    } else {
+                        scope.launch(Dispatchers.IO) {
+                            val result = viewModel.register()
+                            if (result != "Success") {
+                                error = result
+                            }
+                        }
                     }
                 }
             ) {
@@ -130,8 +146,15 @@ fun RegisterComponentPreview() {
                 override fun onRetypePasswordChange(newValue: String) {
                     account.value = account.value.copy(retypePassword = newValue)
                 }
+
+                override suspend fun register(): String {
+                    return "Success"
+                }
             },
-            test = true
+            test = true,
+            onCancel = {
+
+            }
         )
     }
 }

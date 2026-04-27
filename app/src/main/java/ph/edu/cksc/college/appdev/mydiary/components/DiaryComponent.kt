@@ -43,6 +43,8 @@ import ph.edu.cksc.college.appdev.mydiary.DIARY_ENTRY_SCREEN
 import ph.edu.cksc.college.appdev.mydiary.diary.DiaryEntry
 import ph.edu.cksc.college.appdev.mydiary.diary.moodList
 import ph.edu.cksc.college.appdev.mydiary.ui.theme.MyDiaryTheme
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun DiaryEntryCard(
@@ -73,6 +75,8 @@ fun DiaryEntryCard(
         val surfaceColor by animateColorAsState(
             if (isExpanded) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
         )
+        val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy h:mm a")
+        val date = LocalDateTime.parse(entry.dateTime)
 
         // We toggle the isExpanded variable when we click on this Column
         Column(modifier = Modifier
@@ -81,6 +85,12 @@ fun DiaryEntryCard(
             Row(Modifier.fillMaxWidth()) {
                 Text(
                     text = entry.title,
+                    color = MaterialTheme.colorScheme.secondary,
+                )
+            }
+            Row(Modifier.fillMaxWidth()) {
+                Text(
+                    text = formatter.format(date),
                     color = MaterialTheme.colorScheme.secondary,
                 )
             }
@@ -98,7 +108,7 @@ fun DiaryEntryCard(
                     .padding(1.dp)
             ) {
                 Text(
-                    text = entry.content,
+                    text = fromHTML(entry.content),
                     modifier = Modifier.padding(all = 4.dp),
                     // If the message is expanded, we display all its content
                     // otherwise we only display the first line
@@ -110,6 +120,18 @@ fun DiaryEntryCard(
         Spacer(modifier = Modifier.width(8.dp))
         Text(text = "⭐".repeat(entry.star))
     }
+}
+
+fun fromHTML(content: String): String {
+    var result = content
+    result = Regex("<b>(.*?)</b>").replace(result, "$1")
+    result = Regex("<strong>(.*?)</strong>").replace(result, "$1")
+    result = Regex("<i(?: [^>]+)?>(.*?)</i>").replace(result, "$1")
+    result = Regex("<em(?: [^>]+)?>(.*?)</em>").replace(result, "$1")
+    result = Regex("<p>(.*?)</p>").replace(result, "$1\n\n").trim()
+    result = Regex("<br/?>").replace(result, "\n")
+    result = Regex("<span ([^>]+)>(.*?)</span>").replace(result, "$2")
+    return result
 }
 
 @Composable
