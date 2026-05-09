@@ -6,27 +6,25 @@ import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Order
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.datetime.Instant
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import ph.edu.cksc.college.appdev.mydiary.diary.DiaryEntry
 import ph.edu.cksc.college.appdev.mydiary.screens.Entry
-import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 @Serializable
-data class NewEntry @OptIn(ExperimentalTime::class) constructor(
+data class NewEntry(
     val user_id: String,
     val created_at: Instant,
     val title: String,
     val content: String,
     val mood: Int,
-    val star: Int,
+    val star: Int
 )
 
 class StorageService(val supabase: SupabaseClient) {
 
-    @OptIn(ExperimentalTime::class)
     fun getFilteredEntries(filter: String): Flow<List<DiaryEntry>> {
         return flow {
             val items = supabase.from("entries")
@@ -44,21 +42,19 @@ class StorageService(val supabase: SupabaseClient) {
             val list: MutableList<DiaryEntry> = ArrayList()
             for (entry in items) {
                 val item = DiaryEntry(
-                    entry.id,
-                    entry.mood,
-                    entry.star,
-                    entry.title,
-                    entry.content,
-                    entry.created_at.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
+                    id = entry.id,
+                    mood = entry.mood,
+                    star = entry.star,
+                    title = entry.title,
+                    content = entry.content,
+                    dateTime = entry.created_at.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
                 )
-                Log.d("Entry", "${entry.id} => ${entry.title}")
                 list.add(item)
             }
-            emit(list.map { it })
+            emit(list)
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     suspend fun getDiaryEntry(diaryEntryId: String): DiaryEntry? {
         try {
             val entry = supabase.from("entries").select() {
@@ -66,22 +62,20 @@ class StorageService(val supabase: SupabaseClient) {
                     eq("id", diaryEntryId)
                 }
             }.decodeSingle<Entry>()
-            val item = DiaryEntry(
-                entry.id,
-                entry.mood,
-                entry.star,
-                entry.title,
-                entry.content,
-                entry.created_at.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
+            return DiaryEntry(
+                id = entry.id,
+                mood = entry.mood,
+                star = entry.star,
+                title = entry.title,
+                content = entry.content,
+                dateTime = entry.created_at.toLocalDateTime(TimeZone.currentSystemDefault()).toString()
             )
-            Log.d("Entry", "${entry.id} => ${entry.title}")
-            return item
         } catch (e: Exception) {
+            Log.e("StorageService", "Error getting entry", e)
             return null
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     suspend fun save(diaryEntry: DiaryEntry): String {
         val serialEntry = NewEntry(
             user_id = userSession?.user?.id ?: "",
@@ -91,12 +85,11 @@ class StorageService(val supabase: SupabaseClient) {
             mood = diaryEntry.mood,
             star = diaryEntry.star
         )
-        val result = supabase.from("entries").insert(serialEntry)//.decodeSingle<Entry>()
+        val result = supabase.from("entries").insert(serialEntry)
         Log.d("Result", result.data)
-        return ""//result.id
+        return ""
     }
 
-    @OptIn(ExperimentalTime::class)
     suspend fun update(diaryEntry: DiaryEntry) {
         val serialEntry = Entry(
             id = diaryEntry.id,
@@ -107,7 +100,7 @@ class StorageService(val supabase: SupabaseClient) {
             mood = diaryEntry.mood,
             star = diaryEntry.star
         )
-        val result = supabase.from("entries").update(serialEntry) {
+        supabase.from("entries").update(serialEntry) {
             filter {
                 eq("id", diaryEntry.id)
             }
@@ -115,6 +108,10 @@ class StorageService(val supabase: SupabaseClient) {
     }
 
     suspend fun delete(diaryEntryId: String) {
-        //firestore.collection(DIARYENTRY_COLLECTION).document(diaryEntryId).delete().await()
+        supabase.from("entries").delete {
+            filter {
+                eq("id", diaryEntryId)
+            }
+        }
     }
 }

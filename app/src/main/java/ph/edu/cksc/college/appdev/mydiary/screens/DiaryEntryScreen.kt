@@ -1,7 +1,5 @@
 package ph.edu.cksc.college.appdev.mydiary.screens
 
-import android.annotation.SuppressLint
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
@@ -10,25 +8,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
 import ph.edu.cksc.college.appdev.mydiary.components.DateDialog
 import ph.edu.cksc.college.appdev.mydiary.components.DiaryEntryComponent
@@ -38,7 +22,6 @@ import ph.edu.cksc.college.appdev.mydiary.diary.DiaryEntry
 import ph.edu.cksc.college.appdev.mydiary.service.StorageService
 import java.time.LocalDateTime
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiaryEntryScreen(
@@ -47,135 +30,105 @@ fun DiaryEntryScreen(
     navController: NavHostController,
     storageService: StorageService
 ) {
-    val entries = remember { mutableStateListOf(DiaryEntry()) }
-    LaunchedEffect(Unit) {
-        Log.d("Dinner", "Breakfast")
-        val entry = if (id != "")
-            storageService.getDiaryEntry(id) ?: DiaryEntry()
-        else
-            DiaryEntry()
-        entries.add(0, entry)
-        Log.d("Entry", entries[0].toString())
-        viewModel.diaryEntry = mutableStateOf(entry)
+    val context = LocalContext.current
+    val entry by viewModel.diaryEntry
+    
+    // Logic to load data if ID exists (Edit Mode) or clear state (Add Mode)
+    LaunchedEffect(id) {
+        if (id.isNotEmpty() && id != "null") {
+            val loadedEntry = storageService.getDiaryEntry(id)
+            if (loadedEntry != null) {
+                viewModel.diaryEntry.value = loadedEntry
+            }
+        } else {
+            viewModel.diaryEntry.value = DiaryEntry()
+        }
+        viewModel.modified = false
     }
-    val activity = LocalContext.current
-    val date: LocalDateTime = LocalDateTime.parse(entries[0].dateTime)
+
+    val date = try {
+        LocalDateTime.parse(entry.dateTime)
+    } catch (e: Exception) {
+        LocalDateTime.now()
+    }
 
     var showDatePicker by remember { mutableStateOf(false) }
     DateDialog(
-        showDatePicker = showDatePicker, onShowDatePickerChange = { showDatePicker = it},
+        showDatePicker = showDatePicker, onShowDatePickerChange = { showDatePicker = it },
         date = date, onDateChange = { viewModel.onDateTimeChange(it) }
     )
 
     var showTimePicker by remember { mutableStateOf(false) }
     TimeDialog(
-        showTimePicker = showTimePicker, onShowTimePickerChange = { showTimePicker = it},
+        showTimePicker = showTimePicker, onShowTimePickerChange = { showTimePicker = it },
         date = date, onDateChange = { viewModel.onDateTimeChange(it) }
     )
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ),
                 title = {
                     Text(
-                        if (entries[0].id.isEmpty())
-                            "Add Diary Entry"
-                        else
-                            "Edit Diary Entry"
+                        text = if (id.isEmpty() || id == "null") "Add Diary Item" else "Edit Diary Item",
+                        fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        // check if modified...
-                        if (viewModel.modified) {
-                            viewModel.onDoneClick {
-                                Toast.makeText(
-                                    activity,
-                                    if (entries[0].id.isEmpty()) "New Entry" else "Entry updated: ${entries[0].id}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                navController.popBackStack()
-                            }
-                        } else {
-                            navController.popBackStack()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                        showDatePicker = true
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.DateRange,
-                            contentDescription = "Date",
-                        )
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(Icons.Filled.DateRange, "Date")
                     }
-                    IconButton(onClick = {
-                        showTimePicker = true
-                    }) {
-                        Icon(
-                            imageVector = Icons.Filled.AccessTime,
-                            contentDescription = "Time"
-                        )
+                    IconButton(onClick = { showTimePicker = true }) {
+                        Icon(Icons.Filled.AccessTime, "Time")
                     }
                 },
             )
         },
     ) { innerPadding ->
-        Box(
-            modifier = Modifier.padding(innerPadding)
-        ) {
+        Box(modifier = Modifier.padding(innerPadding)) {
             DiaryEntryComponent(
+                id = id,
                 viewModel = viewModel,
-                test = false
+                onDateClick = { showDatePicker = true },
+                onCancel = { navController.popBackStack() },
+                onSave = {
+                    viewModel.onDoneClick {
+                        Toast.makeText(context, "Entry saved successfully", Toast.LENGTH_SHORT).show()
+                        navController.popBackStack()
+                    }
+                }
             )
         }
     }
-    val openDialog = remember { mutableStateOf(false)  }
-    BackHandler(
-        enabled = true
-    ) {
-        if (viewModel.modified) {
-            openDialog.value = true
-        } else {
-            navController.popBackStack()
-        }
+
+    var showDiscardDialog by remember { mutableStateOf(false) }
+    BackHandler(enabled = viewModel.modified) {
+        showDiscardDialog = true
     }
-    if (openDialog.value) {
+
+    if (showDiscardDialog) {
         AlertDialog(
-            onDismissRequest = {
-                openDialog.value = false
-            },
-            title = {
-                Text(text = "Diary Entry")
-            },
-            text = {
-                Text("Discard changes?")
-            },
+            onDismissRequest = { showDiscardDialog = false },
+            title = { Text("Discard changes?") },
+            text = { Text("You have unsaved changes. Are you sure you want to leave?") },
             confirmButton = {
-                Button(
-                    onClick = {
-                        openDialog.value = false
-                        navController.popBackStack()
-                    }) {
-                    Text("Yes")
+                TextButton(onClick = {
+                    showDiscardDialog = false
+                    navController.popBackStack()
+                }) {
+                    Text("Discard")
                 }
             },
             dismissButton = {
-                Button(
-                    onClick = {
-                        openDialog.value = false
-                    }) {
-                    Text("No")
+                TextButton(onClick = { showDiscardDialog = false }) {
+                    Text("Cancel")
                 }
             }
         )

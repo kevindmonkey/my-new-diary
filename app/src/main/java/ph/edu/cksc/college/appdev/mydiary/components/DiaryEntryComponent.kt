@@ -1,35 +1,21 @@
 package ph.edu.cksc.college.appdev.mydiary.components
 
-import SampleDiaryEntries
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MenuAnchorType
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.rememberNavController
-import ph.edu.cksc.college.appdev.mydiary.diary.DiaryEntry
 import ph.edu.cksc.college.appdev.mydiary.diary.moodList
 import ph.edu.cksc.college.appdev.mydiary.diary.starList
-import ph.edu.cksc.college.appdev.mydiary.ui.theme.MyDiaryTheme
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -37,180 +23,144 @@ import java.time.format.DateTimeFormatter
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DiaryEntryComponent(
+    id: String,
     viewModel: DiaryEntryViewModel,
-    test: Boolean
+    onDateClick: () -> Unit,
+    onCancel: () -> Unit,
+    onSave: () -> Unit
 ) {
     val entry by viewModel.diaryEntry
-    var expanded by remember { mutableStateOf(test) }
-    var starExpanded by remember { mutableStateOf(test) }
-    val formatter = DateTimeFormatter.ofPattern("MMM d, yy\nh:mm a")
-    val date = LocalDateTime.parse(entry.dateTime)
+    var moodExpanded by remember { mutableStateOf(false) }
+    var starExpanded by remember { mutableStateOf(false) }
+    
+    val displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val date = try { LocalDateTime.parse(entry.dateTime) } catch (e: Exception) { LocalDateTime.now() }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
     ) {
-        Row {
+        Text(
+            text = if (id.isEmpty() || id == "null") "Add Diary Item" else "Edit Diary Item",
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // Metadata: Date, Mood, Rating
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = date.format(displayFormatter),
+                onValueChange = {},
+                readOnly = true,
+                label = { Text("Date/time") },
+                modifier = Modifier.weight(1f).clickable { onDateClick() },
+                enabled = false,
+                colors = OutlinedTextFieldDefaults.colors(
+                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
+                    disabledBorderColor = MaterialTheme.colorScheme.outline,
+                )
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = {
-                    expanded = !expanded
-                }
+                expanded = moodExpanded,
+                onExpandedChange = { moodExpanded = it },
+                modifier = Modifier.weight(1f)
             ) {
                 OutlinedTextField(
                     value = moodList[entry.mood].mood,
                     onValueChange = {},
                     readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryEditable, true),
-                    leadingIcon = {
-                        Icon(
-                            imageVector = moodList[entry.mood].icon,
-                            tint = moodList[entry.mood].color,
-                            contentDescription = moodList[entry.mood].mood
-                        )
-                    },
-                    label = { Text("Mood") }
+                    label = { Text("Mood") },
+                    leadingIcon = { Icon(moodList[entry.mood].icon, null, tint = moodList[entry.mood].color) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = moodExpanded) },
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 )
-                ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
+                ExposedDropdownMenu(expanded = moodExpanded, onDismissRequest = { moodExpanded = false }) {
                     moodList.forEachIndexed { index, item ->
                         DropdownMenuItem(
-                            text = {
-                                Row() {
-                                    Icon(
-                                        imageVector = item.icon,
-                                        tint = item.color,
-                                        contentDescription = item.mood
-                                    )
-                                    Text(
-                                        text = item.mood,
-                                        modifier = Modifier.padding(start = 16.dp)
-                                    )
+                            text = { 
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(item.icon, null, tint = item.color, modifier = Modifier.size(20.dp))
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(item.mood)
                                 }
                             },
-                            onClick = {
-                                viewModel.onMoodChange(index)
-                                expanded = false
-                            }
+                            onClick = { viewModel.onMoodChange(index); moodExpanded = false }
                         )
                     }
                 }
             }
-            Text(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(4.dp),
-                text = formatter.format(date)
-            )
-        }
-        Row {
-            OutlinedTextField(
-                //modifier = Modifier.fillMaxWidth(),
-                value = entry.title,
-                onValueChange = {
-                    viewModel.onTitleChange(it)
-                },
-                label = { Text("Title") }
-            )
+
             ExposedDropdownMenuBox(
                 expanded = starExpanded,
-                onExpandedChange = {
-                    starExpanded = !starExpanded
-                }
+                onExpandedChange = { starExpanded = it },
+                modifier = Modifier.weight(1f)
             ) {
                 OutlinedTextField(
-                    value = "" + entry.star,
+                    value = "★".repeat(entry.star),
                     onValueChange = {},
                     readOnly = true,
+                    label = { Text("Rating") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = starExpanded) },
-                    modifier = Modifier.menuAnchor(),
-                    label = { Text("Star") }
+                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
                 )
-                ExposedDropdownMenu(
-                    expanded = starExpanded,
-                    onDismissRequest = { starExpanded = false }
-                ) {
-                    starList.forEachIndexed { index, item ->
+                ExposedDropdownMenu(expanded = starExpanded, onDismissRequest = { starExpanded = false }) {
+                    starList.forEach { star ->
                         DropdownMenuItem(
-                            text = {
-                                Text(
-                                    text = "" + item,
-                                    modifier = Modifier.padding(start = 16.dp)
-                                )
-                            },
-                            onClick = {
-                                viewModel.onStarChange(item)
-                                starExpanded = false
-                            }
+                            text = { Text("★".repeat(star)) },
+                            onClick = { viewModel.onStarChange(star); starExpanded = false }
                         )
                     }
                 }
             }
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
         OutlinedTextField(
-            modifier = Modifier.fillMaxSize(),
+            value = entry.title,
+            onValueChange = { viewModel.onTitleChange(it) },
+            label = { Text("Title") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            textStyle = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
             value = entry.content,
-            onValueChange = {
-                viewModel.onContentChange(it)
-            },
-            label = { Text("Content") }
+            onValueChange = { viewModel.onContentChange(it) },
+            label = { Text("Content") },
+            modifier = Modifier.fillMaxWidth().heightIn(min = 250.dp)
         )
-    }
-}
 
-@RequiresApi(Build.VERSION_CODES.O)
-@Preview(showBackground = true)
-@Composable
-fun EditDiaryPreview() {
-    val navController = rememberNavController()
-    MyDiaryTheme(dynamicColor = false) {
-        DiaryEntryComponent(
-            viewModel = object : DiaryEntryViewModel {
-                @SuppressLint("UnrememberedMutableState")
-                override var diaryEntry = mutableStateOf(DiaryEntry())
+        Spacer(modifier = Modifier.height(32.dp))
 
-                init {
-                    diaryEntry.value = DiaryEntry(
-                        "merong-id",
-                        0, 5,
-                        "Lexi",
-                        "Test...Test...Test...",
-                        LocalDateTime.of(2024, 1, 1, 7, 30).toString()
-                    )
-                }
-
-                override var modified: Boolean = true
-
-                override fun onTitleChange(newValue: String) {
-                    diaryEntry.value = diaryEntry.value.copy(title = newValue)
-                }
-
-                override fun onContentChange(newValue: String) {
-                    diaryEntry.value = diaryEntry.value.copy(content = newValue)
-                }
-
-                override fun onMoodChange(newValue: Int) {
-                    diaryEntry.value = diaryEntry.value.copy(mood = newValue)
-                }
-
-                override fun onStarChange(newValue: Int) {
-                    diaryEntry.value = diaryEntry.value.copy(star = newValue)
-                }
-
-                override fun onDateTimeChange(newValue: LocalDateTime) {
-                    val newDueDate = newValue.toString()
-                    diaryEntry.value = diaryEntry.value.copy(dateTime = newDueDate)
-                }
-
-                override fun onDoneClick(popUpScreen: () -> Unit) {
-
-                }
-            },
-            test = true
-            //navController = navController,
-            //FirebaseAuth.getInstance(), Firebase.firestore
-        )
+        // Action Buttons
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+            Button(
+                onClick = onCancel,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant, 
+                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            ) {
+                Text("Cancel")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(onClick = onSave) {
+                Text("Save")
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(100.dp))
     }
 }

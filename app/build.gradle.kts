@@ -12,15 +12,12 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    kotlin("plugin.serialization") version "1.9.0"
-
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "ph.edu.cksc.college.appdev.mydiary"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36
 
     buildFeatures {
         buildConfig = true
@@ -36,10 +33,11 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", localProperties.getProperty("SUPABASE_PUBLISHABLE_KEY"))
-        //buildConfigField("String", "SECRET", localProperties.getProperty("SECRET"))
-        buildConfigField("String", "SUPABASE_URL", localProperties.getProperty("SUPABASE_URL"))
+        val supabasePublishableKey = localProperties.getProperty("SUPABASE_PUBLISHABLE_KEY") ?: ""
+        val supabaseUrl = localProperties.getProperty("SUPABASE_URL") ?: ""
 
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"$supabasePublishableKey\"")
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
 
     }
 
@@ -75,10 +73,18 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended:1.7.8")
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.kotlinx.datetime)
 
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.4.1"))
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.0.1"))
     implementation("io.github.jan-tennert.supabase:postgrest-kt")
-    implementation("io.ktor:ktor-client-android:3.4.1")
+    implementation("io.github.jan-tennert.supabase:auth-kt")
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
+    implementation("io.github.jan-tennert.supabase:storage-kt")
+    implementation("io.ktor:ktor-client-android:3.0.1")
+    
+    // Image loading
+    implementation(libs.coil.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

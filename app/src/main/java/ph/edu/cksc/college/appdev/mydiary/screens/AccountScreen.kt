@@ -2,9 +2,14 @@ package ph.edu.cksc.college.appdev.mydiary.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -13,21 +18,22 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.user.UserSession
-import io.github.jan.supabase.postgrest.from
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ph.edu.cksc.college.appdev.mydiary.LOGIN_SCREEN
@@ -41,40 +47,19 @@ data class Profile (
     val email: String,
     @SerialName("full_name")  val fullName: String)
 
-// just a demo to read profiles
-suspend fun init() {
-    val list = supabase.from("profiles").select().decodeList<Profile>()
-    Log.d("AccountScreen", list.toString())
-}
-
 fun getSettion(): String {
     try {
         val session: UserSession? = supabase.auth.currentSessionOrNull()
         userSession = session
-        println("User signed in previously successfully: ${userSession}")
         return "Success"
     } catch (e: Exception) {
-        val error = e.message ?: "Session error"
-        Log.e("Session", error, e)
-        println("Get Session failed: ${error}")
-        return error
+        return e.message ?: "Session error"
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccountScreen(navController: NavHostController) {
-    // if you want automatic, uncomment these
-    /*val scope = rememberCoroutineScope()
-    LaunchedEffect(Unit) {
-        scope.launch {
-            val result = getSettion()
-            if (result == "Success") {
-                navController.navigate(MAIN_SCREEN)
-            }
-        }
-    }*/
     Scaffold(
         topBar = {
             TopAppBar(
@@ -82,17 +67,10 @@ fun AccountScreen(navController: NavHostController) {
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
-                title = {
-                    Text("App Dev Demo")
-                },
+                title = { Text("Account") },
                 navigationIcon = {
-                    IconButton(onClick = {
-                        navController.popBackStack()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                     }
                 },
             )
@@ -105,37 +83,67 @@ fun AccountScreen(navController: NavHostController) {
 @Composable
 fun AccountScrollContent(innerPadding: PaddingValues, navController: NavHostController) {
     val scope = rememberCoroutineScope()
-    Box(
-        modifier = Modifier.padding(innerPadding)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(innerPadding)
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Column() {
-            Button( onClick = {
-                navController.navigate(REGISTRATION_SCREEN)
-            }) {
-                Text("Register")
-            }
-            Button( onClick = {
-                navController.navigate(LOGIN_SCREEN)
-            }) {
-                Text("Login")
-            }
-            Button( onClick = {
-                scope.launch {
-                    supabase.auth.signOut()
-                }
-            }) {
-                Text("Log out")
-            }
-            Button( onClick = {
+        Text(
+            text = "My Diary",
+            style = MaterialTheme.typography.displaySmall,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Text(
+            text = "Keep your memories safe",
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.outline,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(48.dp))
+
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { navController.navigate(LOGIN_SCREEN) }
+        ) {
+            Text("Login")
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        OutlinedButton(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { navController.navigate(REGISTRATION_SCREEN) }
+        ) {
+            Text("Create Account")
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Text(
+            modifier = Modifier.clickable {
                 scope.launch {
                     val result = getSettion()
-                    if (result == "Success") {
-                        navController.navigate(MAIN_SCREEN)
-                    }
+                    if (result == "Success") navController.navigate(MAIN_SCREEN)
                 }
-            }) {
-                Text("Resume if already signed in")
-            }
+            }.padding(8.dp),
+            text = "Already signed in? Resume here",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedButton(
+            modifier = Modifier.fillMaxWidth(),
+            onClick = { scope.launch { supabase.auth.signOut() } }
+        ) {
+            Text("Log out")
         }
     }
 }
