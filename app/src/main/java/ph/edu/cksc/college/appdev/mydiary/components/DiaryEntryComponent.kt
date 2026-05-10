@@ -5,6 +5,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -12,8 +13,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import ph.edu.cksc.college.appdev.mydiary.diary.moodList
 import ph.edu.cksc.college.appdev.mydiary.diary.starList
 import java.time.LocalDateTime
@@ -30,137 +33,244 @@ fun DiaryEntryComponent(
     onSave: () -> Unit
 ) {
     val entry by viewModel.diaryEntry
-    var moodExpanded by remember { mutableStateOf(false) }
-    var starExpanded by remember { mutableStateOf(false) }
     
-    val displayFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    val displayFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")
+    val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
     val date = try { LocalDateTime.parse(entry.dateTime) } catch (e: Exception) { LocalDateTime.now() }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(horizontal = 24.dp, vertical = 16.dp),
     ) {
-        Text(
-            text = if (id.isEmpty() || id == "null") "Add Diary Item" else "Edit Diary Item",
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        // Metadata: Date, Mood, Rating
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            OutlinedTextField(
-                value = date.format(displayFormatter),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Date/time") },
-                modifier = Modifier.weight(1f).clickable { onDateClick() },
-                enabled = false,
-                colors = OutlinedTextFieldDefaults.colors(
-                    disabledTextColor = MaterialTheme.colorScheme.onSurface,
-                    disabledBorderColor = MaterialTheme.colorScheme.outline,
-                )
+        // Subtle Date Header
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onDateClick() }
+        ) {
+            Text(
+                text = date.format(displayFormatter).uppercase(),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
+            Text(
+                text = date.format(timeFormatter),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.outline,
+                modifier = Modifier.padding(top = 2.dp)
             )
         }
-        
-        Spacer(modifier = Modifier.height(12.dp))
 
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            ExposedDropdownMenuBox(
-                expanded = moodExpanded,
-                onExpandedChange = { moodExpanded = it },
-                modifier = Modifier.weight(1f)
-            ) {
-                OutlinedTextField(
-                    value = moodList[entry.mood].mood,
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Mood") },
-                    leadingIcon = { Icon(moodList[entry.mood].icon, null, tint = moodList[entry.mood].color) },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = moodExpanded) },
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                )
-                ExposedDropdownMenu(expanded = moodExpanded, onDismissRequest = { moodExpanded = false }) {
-                    moodList.forEachIndexed { index, item ->
-                        DropdownMenuItem(
-                            text = { 
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(item.icon, null, tint = item.color, modifier = Modifier.size(20.dp))
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(item.mood)
-                                }
-                            },
-                            onClick = { viewModel.onMoodChange(index); moodExpanded = false }
-                        )
-                    }
-                }
-            }
+        Spacer(modifier = Modifier.height(32.dp))
 
-            ExposedDropdownMenuBox(
-                expanded = starExpanded,
-                onExpandedChange = { starExpanded = it },
-                modifier = Modifier.weight(1f)
-            ) {
-                OutlinedTextField(
-                    value = "★".repeat(entry.star),
-                    onValueChange = {},
-                    readOnly = true,
-                    label = { Text("Rating") },
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = starExpanded) },
-                    modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
-                )
-                ExposedDropdownMenu(expanded = starExpanded, onDismissRequest = { starExpanded = false }) {
-                    starList.forEach { star ->
-                        DropdownMenuItem(
-                            text = { Text("★".repeat(star)) },
-                            onClick = { viewModel.onStarChange(star); starExpanded = false }
-                        )
-                    }
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        OutlinedTextField(
+        // Large Seamless Title
+        TextField(
             value = entry.title,
             onValueChange = { viewModel.onTitleChange(it) },
-            label = { Text("Title") },
+            placeholder = { 
+                Text(
+                    "Entry Title", 
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
+                ) 
+            },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            textStyle = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold)
+            textStyle = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onSurface
+            ),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = MaterialTheme.colorScheme.primary
+            )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
-        OutlinedTextField(
+        // Metadata Chips Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            MoodSelectorChip(
+                selectedMoodIndex = entry.mood,
+                onMoodSelected = { viewModel.onMoodChange(it) }
+            )
+            
+            StarSelectorChip(
+                selectedStars = entry.star,
+                onStarSelected = { viewModel.onStarChange(it) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Seamless Content Body
+        TextField(
             value = entry.content,
             onValueChange = { viewModel.onContentChange(it) },
-            label = { Text("Content") },
-            modifier = Modifier.fillMaxWidth().heightIn(min = 250.dp)
+            placeholder = { 
+                Text(
+                    "Start writing here...", 
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
+                ) 
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 400.dp),
+            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                lineHeight = 28.sp,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+            ),
+            colors = TextFieldDefaults.colors(
+                focusedContainerColor = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                focusedIndicatorColor = Color.Transparent,
+                unfocusedIndicatorColor = Color.Transparent,
+                cursorColor = MaterialTheme.colorScheme.primary
+            )
         )
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Action Buttons
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-            Button(
+        // Clean Action Buttons
+        Row(
+            modifier = Modifier.fillMaxWidth(), 
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            TextButton(
                 onClick = onCancel,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant, 
-                    contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                modifier = Modifier.weight(1f),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Cancel")
+                Text("Discard", color = MaterialTheme.colorScheme.outline)
             }
-            Spacer(modifier = Modifier.width(8.dp))
-            Button(onClick = onSave) {
-                Text("Save")
+            
+            Button(
+                onClick = onSave,
+                modifier = Modifier.weight(1.2f),
+                shape = RoundedCornerShape(12.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp),
+                contentPadding = PaddingValues(vertical = 12.dp)
+            ) {
+                Icon(Icons.Default.Done, null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Save Entry", fontWeight = FontWeight.Bold)
             }
         }
         
-        Spacer(modifier = Modifier.height(100.dp))
+        Spacer(modifier = Modifier.height(48.dp))
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun MoodSelectorChip(
+    selectedMoodIndex: Int,
+    onMoodSelected: (Int) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val currentMood = moodList[selectedMoodIndex]
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        Surface(
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+            onClick = { expanded = true }
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(currentMood.icon, null, tint = currentMood.color, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(currentMood.mood, style = MaterialTheme.typography.labelLarge)
+                Icon(Icons.Default.ArrowDropDown, null, modifier = Modifier.size(18.dp))
+            }
+        }
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            moodList.forEachIndexed { index, item ->
+                DropdownMenuItem(
+                    text = { 
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(item.icon, null, tint = item.color, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(10.dp))
+                            Text(item.mood)
+                        }
+                    },
+                    onClick = { onMoodSelected(index); expanded = false }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun StarSelectorChip(
+    selectedStars: Int,
+    onStarSelected: (Int) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it }
+    ) {
+        Surface(
+            modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable),
+            shape = RoundedCornerShape(12.dp),
+            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+            onClick = { expanded = true }
+        ) {
+            Row(
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(Icons.Default.Star, null, tint = Color(0xFFFFB400), modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("$selectedStars Stars", style = MaterialTheme.typography.labelLarge)
+                Icon(Icons.Default.ArrowDropDown, null, modifier = Modifier.size(18.dp))
+            }
+        }
+
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            starList.forEach { star ->
+                DropdownMenuItem(
+                    text = {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Default.Star, null, tint = Color(0xFFFFB400), modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(10.dp))
+                            Text("$star Stars")
+                        }
+                    },
+                    onClick = { onStarSelected(star); expanded = false }
+                )
+            }
+        }
     }
 }

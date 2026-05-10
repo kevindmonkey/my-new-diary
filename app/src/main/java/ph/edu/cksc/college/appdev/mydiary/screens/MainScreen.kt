@@ -19,6 +19,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import ph.edu.cksc.college.appdev.mydiary.ABOUT_SCREEN
 import ph.edu.cksc.college.appdev.mydiary.DIARY_ENTRY_SCREEN
+import ph.edu.cksc.college.appdev.mydiary.THEME_SCREEN
 import ph.edu.cksc.college.appdev.mydiary.components.DiaryList
 import ph.edu.cksc.college.appdev.mydiary.diary.DiaryEntry
 import ph.edu.cksc.college.appdev.mydiary.diary.moodList
@@ -68,6 +69,9 @@ fun MainScreen(navController: NavHostController, storageService: StorageService)
                         }
                     },
                     actions = {
+                        IconButton(onClick = { navController.navigate(THEME_SCREEN) }) {
+                            Icon(Icons.Default.Brush, contentDescription = "Themes")
+                        }
                         IconButton(onClick = { 
                             isSearchExpanded = !isSearchExpanded 
                             if (!isSearchExpanded) {

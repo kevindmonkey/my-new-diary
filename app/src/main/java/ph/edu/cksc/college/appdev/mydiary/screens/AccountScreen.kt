@@ -4,16 +4,22 @@ import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -68,7 +74,9 @@ fun getSession(): String {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountScreen(navController: NavHostController) {
+fun AccountScreen(
+    navController: NavHostController
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -90,7 +98,10 @@ fun AccountScreen(navController: NavHostController) {
 }
 
 @Composable
-fun AccountScrollContent(innerPadding: PaddingValues, navController: NavHostController) {
+fun AccountScrollContent(
+    innerPadding: PaddingValues,
+    navController: NavHostController
+) {
     val scope = rememberCoroutineScope()
     Column(
         modifier = Modifier
@@ -124,7 +135,7 @@ fun AccountScrollContent(innerPadding: PaddingValues, navController: NavHostCont
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         Button(
             modifier = Modifier.fillMaxWidth(),

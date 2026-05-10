@@ -7,6 +7,7 @@ const val ACCOUNT_SCREEN = "AccountScreen"
 const val SETTINGS_SCREEN = "SettingsScreen"
 const val LOGIN_SCREEN = "LoginScreen"
 const val REGISTRATION_SCREEN = "RegistrationScreen"
+const val THEME_SCREEN = "ThemeScreen"
 //const val TASKS_SCREEN = "TasksScreen"
 //const val EDIT_TASK_SCREEN = "EditTaskScreen"
 

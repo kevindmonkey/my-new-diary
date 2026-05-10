@@ -10,11 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +28,7 @@ import ph.edu.cksc.college.appdev.mydiary.screens.*
 import ph.edu.cksc.college.appdev.mydiary.service.AccountService
 import ph.edu.cksc.college.appdev.mydiary.service.StorageService
 import ph.edu.cksc.college.appdev.mydiary.ui.theme.MyDiaryTheme
+import ph.edu.cksc.college.appdev.mydiary.ui.theme.ThemeType
 import java.time.LocalDateTime
 
 val supabase = createSupabaseClient(
@@ -45,15 +44,37 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyDiaryTheme {
-                AppNavigation()
+            var currentTheme by remember { mutableStateOf(ThemeType.DEFAULT) }
+            var customPrimary by remember { mutableStateOf(Color(0xFF4FC3F7)) }
+            var customBackground by remember { mutableStateOf(Color.White) }
+            
+            MyDiaryTheme(
+                themeType = currentTheme,
+                customPrimary = customPrimary,
+                customBackground = customBackground
+            ) {
+                AppNavigation(
+                    currentTheme = currentTheme,
+                    customPrimary = customPrimary,
+                    customBackground = customBackground,
+                    onThemeChange = { currentTheme = it },
+                    onCustomPrimaryChange = { customPrimary = it },
+                    onCustomBackgroundChange = { customBackground = it }
+                )
             }
         }
     }
 
     @SuppressLint("UnrememberedMutableState")
     @Composable
-    fun AppNavigation() {
+    fun AppNavigation(
+        currentTheme: ThemeType,
+        customPrimary: Color,
+        customBackground: Color,
+        onThemeChange: (ThemeType) -> Unit,
+        onCustomPrimaryChange: (Color) -> Unit,
+        onCustomBackgroundChange: (Color) -> Unit
+    ) {
         val scope = rememberCoroutineScope()
         val storageService = remember { StorageService(supabase) }
         val accountService = remember { AccountService(supabase) }
@@ -120,11 +141,26 @@ class MainActivity : ComponentActivity() {
                 startDestination = ACCOUNT_SCREEN,
                 modifier = Modifier.padding(innerPadding)
             ) {
-                composable(ACCOUNT_SCREEN) { AccountScreen(navController) }
+                composable(ACCOUNT_SCREEN) { 
+                    AccountScreen(
+                        navController = navController
+                    ) 
+                }
                 composable(MAIN_SCREEN) { MainScreen(navController, storageService) }
                 composable(ABOUT_SCREEN) { AboutScreen(navController) }
                 composable(LOGIN_SCREEN) { LoginScreen(navController, snackbarHostState, accountService) }
                 composable(REGISTRATION_SCREEN) { RegistrationScreen(navController, snackbarHostState, accountService) }
+                composable(THEME_SCREEN) {
+                    ThemeScreen(
+                        navController = navController,
+                        currentTheme = currentTheme,
+                        customPrimary = customPrimary,
+                        customBackground = customBackground,
+                        onThemeChange = onThemeChange,
+                        onCustomPrimaryChange = onCustomPrimaryChange,
+                        onCustomBackgroundChange = onCustomBackgroundChange
+                    )
+                }
                 composable(
                     "$DIARY_ENTRY_SCREEN/{id}",
                     arguments = listOf(navArgument("id") { 
