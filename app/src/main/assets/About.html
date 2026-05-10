@@ -3,14 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>About Software Engineering Project</title>
+    <title>About CKSC Chronicles</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        #logo {width: 50%}
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fcfaff; /* Light purple tint */
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        h1 {
+            color: #6750A4; /* Matches Android Purple */
+            font-size: 24px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .description {
+            font-size: 15px;
+            color: #555;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 18px;
+            border-bottom: 2px solid #eaddff;
+            padding-bottom: 5px;
+            margin-top: 20px;
+        }
+        .team-grid {
+            margin-top: 15px;
+        }
+        .member {
+            background: #f6edff;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .member span {
+            font-weight: 600;
+            color: #21005d;
+        }
+        .role {
+            font-size: 12px;
+            color: #6750a4;
+            background: #fff;
+            padding: 2px 8px;
+            border-radius: 5px;
+            text-transform: uppercase;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+        }
+        #logo {
+            width: 80px;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
-<h1>About the app</h1>
-<p>Later...</p>
-<img id='logo' src='SVG_Logo.svg' alt='Logo'>
+
+<div class="container">
+    <h1>CKSC CHRONICLES</h1>
+    <p class="description">
+        A premium digital journal designed to capture your daily experiences,
+        emotional trends, and precious life in one secure place.
+    </p>
+
+    <div class="section-title">Development Team</div>
+    <div class="team-grid">
+        <div class="member">
+            <span>Athrone Yael Rosal</span>
+            <div class="role">UI/DESIGN</div>
+        </div>
+        <div class="member">
+            <span>John Kevin Mendoza</span>
+            <div class="role">LEAD DEVELOPER</div>
+        </div>
+        <div class="member">
+            <span>Hong Mingcharm</span>
+            <div class="role">DEVELOPER</div>
+        </div>
+    </div>
+
+    <div class="section-title">Version</div>
+    <p style="font-size: 14px;">1.0.0 (Stable Build)</p>
+
+    <div class="footer">
+        <img id='logo' src='SVG_Logo.svg' alt='Logo'>
+        <p style="font-size: 12px; color: #aaa;">&copy; 2026 App Dev Demo Project</p>
+    </div>
+</div>
+
 </body>
 </html>
