@@ -21,6 +21,7 @@ import androidx.navigation.navArgument
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.launch
 import ph.edu.cksc.college.appdev.mydiary.components.DiaryEntryViewModel
 import ph.edu.cksc.college.appdev.mydiary.diary.DiaryEntry
@@ -31,12 +32,14 @@ import ph.edu.cksc.college.appdev.mydiary.ui.theme.MyDiaryTheme
 import ph.edu.cksc.college.appdev.mydiary.ui.theme.ThemeType
 import java.time.LocalDateTime
 
+
 val supabase = createSupabaseClient(
     supabaseUrl = BuildConfig.SUPABASE_URL,
     supabaseKey = BuildConfig.SUPABASE_PUBLISHABLE_KEY
 ) {
     install(Auth)
     install(Postgrest)
+    install(Storage)
 }
 
 class MainActivity : ComponentActivity() {
@@ -111,6 +114,34 @@ class MainActivity : ComponentActivity() {
 
                 override fun onDateTimeChange(newValue: LocalDateTime) {
                     diaryEntry.value = diaryEntry.value.copy(dateTime = newValue.toString())
+                    modified = true
+                }
+
+                override fun onAddPhoto(url: String) {
+                    val currentPhotos = diaryEntry.value.photoUrls.toMutableList()
+                    currentPhotos.add(url)
+                    diaryEntry.value = diaryEntry.value.copy(photoUrls = currentPhotos)
+                    modified = true
+                }
+
+                override fun onRemovePhoto(url: String) {
+                    val currentPhotos = diaryEntry.value.photoUrls.toMutableList()
+                    currentPhotos.remove(url)
+                    diaryEntry.value = diaryEntry.value.copy(photoUrls = currentPhotos)
+                    modified = true
+                }
+
+                override fun onAddVoiceMemo(url: String) {
+                    val currentMemos = diaryEntry.value.voiceMemoUrls.toMutableList()
+                    currentMemos.add(url)
+                    diaryEntry.value = diaryEntry.value.copy(voiceMemoUrls = currentMemos)
+                    modified = true
+                }
+
+                override fun onRemoveVoiceMemo(url: String) {
+                    val currentMemos = diaryEntry.value.voiceMemoUrls.toMutableList()
+                    currentMemos.remove(url)
+                    diaryEntry.value = diaryEntry.value.copy(voiceMemoUrls = currentMemos)
                     modified = true
                 }
 

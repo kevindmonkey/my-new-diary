@@ -13,6 +13,10 @@ interface DiaryEntryViewModel {
     fun onMoodChange(newValue: Int)
     fun onStarChange(newValue: Int)
     fun onDateTimeChange(newValue: LocalDateTime)
+    fun onAddPhoto(url: String)
+    fun onRemovePhoto(url: String)
+    fun onAddVoiceMemo(url: String)
+    fun onRemoveVoiceMemo(url: String)
 
     fun onDoneClick(popUpScreen: () -> Unit)
 }

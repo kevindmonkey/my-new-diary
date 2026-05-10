@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -33,15 +34,21 @@ fun DiaryEntryScreen(
     val context = LocalContext.current
     val entry by viewModel.diaryEntry
     
+    // New state for Edit vs View mode
+    var isEditing by remember { mutableStateOf(id.isEmpty() || id == "null") }
+
     // Logic to load data if ID exists (Edit Mode) or clear state (Add Mode)
     LaunchedEffect(id) {
         if (id.isNotEmpty() && id != "null") {
             val loadedEntry = storageService.getDiaryEntry(id)
             if (loadedEntry != null) {
                 viewModel.diaryEntry.value = loadedEntry
+                // Increment view count when viewing
+                storageService.incrementViewCount(loadedEntry.id, loadedEntry.viewCount)
             }
         } else {
             viewModel.diaryEntry.value = DiaryEntry()
+            isEditing = true
         }
         viewModel.modified = false
     }
@@ -72,21 +79,33 @@ fun DiaryEntryScreen(
                 ),
                 title = {
                     Text(
-                        text = if (id.isEmpty() || id == "null") "Add Diary Item" else "Edit Diary Item",
+                        text = if (id.isEmpty() || id == "null") "New Entry" else if (isEditing) "Edit Entry" else "View Entry",
                         fontWeight = FontWeight.SemiBold
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = { 
+                        if (isEditing && id.isNotEmpty() && id != "null") {
+                            isEditing = false // Go back to viewing
+                        } else {
+                            navController.popBackStack() 
+                        }
+                    }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Filled.DateRange, "Date")
-                    }
-                    IconButton(onClick = { showTimePicker = true }) {
-                        Icon(Icons.Filled.AccessTime, "Time")
+                    if (!isEditing) {
+                        IconButton(onClick = { isEditing = true }) {
+                            Icon(Icons.Default.Edit, "Edit")
+                        }
+                    } else {
+                        IconButton(onClick = { showDatePicker = true }) {
+                            Icon(Icons.Filled.DateRange, "Date")
+                        }
+                        IconButton(onClick = { showTimePicker = true }) {
+                            Icon(Icons.Filled.AccessTime, "Time")
+                        }
                     }
                 },
             )
@@ -96,12 +115,20 @@ fun DiaryEntryScreen(
             DiaryEntryComponent(
                 id = id,
                 viewModel = viewModel,
-                onDateClick = { showDatePicker = true },
-                onCancel = { navController.popBackStack() },
+                storageService = storageService,
+                isEditing = isEditing, // Pass isEditing state
+                onDateClick = { if (isEditing) showDatePicker = true },
+                onCancel = { 
+                    if (id.isEmpty() || id == "null") {
+                        navController.popBackStack()
+                    } else {
+                        isEditing = false
+                    }
+                },
                 onSave = {
                     viewModel.onDoneClick {
                         Toast.makeText(context, "Entry saved successfully", Toast.LENGTH_SHORT).show()
-                        navController.popBackStack()
+                        isEditing = false // Switch back to viewing mode after save
                     }
                 }
             )
@@ -109,7 +136,7 @@ fun DiaryEntryScreen(
     }
 
     var showDiscardDialog by remember { mutableStateOf(false) }
-    BackHandler(enabled = viewModel.modified) {
+    BackHandler(enabled = viewModel.modified && isEditing) {
         showDiscardDialog = true
     }
 
@@ -121,7 +148,11 @@ fun DiaryEntryScreen(
             confirmButton = {
                 TextButton(onClick = {
                     showDiscardDialog = false
-                    navController.popBackStack()
+                    if (id.isEmpty() || id == "null") {
+                        navController.popBackStack()
+                    } else {
+                        isEditing = false
+                    }
                 }) {
                     Text("Discard")
                 }

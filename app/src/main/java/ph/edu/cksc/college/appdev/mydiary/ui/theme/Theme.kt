@@ -2,7 +2,6 @@ package ph.edu.cksc.college.appdev.mydiary.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -37,7 +36,10 @@ private val CyberColorScheme = darkColorScheme(
     onPrimary = Color.Black,
     onSecondary = Color.Black,
     onBackground = Color.White,
-    onSurface = Color.White
+    onSurface = Color.White,
+    surfaceVariant = Color(0xFF2C2C2C),
+    onSurfaceVariant = Color.White.copy(alpha = 0.7f),
+    outline = Color.White.copy(alpha = 0.5f)
 )
 
 private val SakuraColorScheme = lightColorScheme(
@@ -46,7 +48,10 @@ private val SakuraColorScheme = lightColorScheme(
     background = PinkBackground,
     surface = Color.White,
     onPrimary = Color.White,
-    onSecondary = Color.Black
+    onSecondary = Color.Black,
+    surfaceVariant = Color(0xFFFFF8FA),
+    onSurfaceVariant = Color.Black.copy(alpha = 0.7f),
+    outline = Color.Black.copy(alpha = 0.3f)
 )
 
 private val ForestColorScheme = lightColorScheme(
@@ -55,7 +60,10 @@ private val ForestColorScheme = lightColorScheme(
     background = GreenBackground,
     surface = Color.White,
     onPrimary = Color.White,
-    onSecondary = Color.Black
+    onSecondary = Color.Black,
+    surfaceVariant = Color(0xFFF1F8F2),
+    onSurfaceVariant = Color.Black.copy(alpha = 0.7f),
+    outline = Color.Black.copy(alpha = 0.3f)
 )
 
 @Composable
@@ -75,22 +83,50 @@ fun MyDiaryTheme(
         ThemeType.CUSTOM -> {
             val isLightBackground = customBackground.luminance() > 0.5
             val isLightPrimary = customPrimary.luminance() > 0.5
+            val onBackground = if (isLightBackground) Color.Black else Color.White
+            val onPrimary = if (isLightPrimary) Color.Black else Color.White
             
-            lightColorScheme(
-                primary = customPrimary,
-                onPrimary = if (isLightPrimary) Color.Black else Color.White,
-                background = customBackground,
-                onBackground = if (isLightBackground) Color.Black else Color.White,
-                surface = customBackground,
-                onSurface = if (isLightBackground) Color.Black else Color.White,
-                secondary = customPrimary.copy(alpha = 0.8f),
-                onSecondary = if (isLightPrimary) Color.Black else Color.White,
-                primaryContainer = customPrimary.copy(alpha = 0.2f),
-                onPrimaryContainer = if (isLightBackground) Color.Black else Color.White
-            )
+            if (isLightBackground) {
+                lightColorScheme(
+                    primary = customPrimary,
+                    onPrimary = onPrimary,
+                    background = customBackground,
+                    onBackground = onBackground,
+                    surface = customBackground,
+                    onSurface = onBackground,
+                    secondary = customPrimary.copy(alpha = 0.8f),
+                    onSecondary = onPrimary,
+                    primaryContainer = customPrimary.copy(alpha = 0.2f),
+                    onPrimaryContainer = onBackground,
+                    surfaceVariant = if (isLightBackground) Color.Black.copy(alpha = 0.05f) else Color.White.copy(alpha = 0.1f),
+                    onSurfaceVariant = onBackground.copy(alpha = 0.7f),
+                    outline = onBackground.copy(alpha = 0.4f)
+                )
+            } else {
+                darkColorScheme(
+                    primary = customPrimary,
+                    onPrimary = onPrimary,
+                    background = customBackground,
+                    onBackground = onBackground,
+                    surface = customBackground,
+                    onSurface = onBackground,
+                    secondary = customPrimary.copy(alpha = 0.8f),
+                    onSecondary = onPrimary,
+                    primaryContainer = customPrimary.copy(alpha = 0.2f),
+                    onPrimaryContainer = onBackground,
+                    surfaceVariant = Color.White.copy(alpha = 0.1f),
+                    onSurfaceVariant = onBackground.copy(alpha = 0.7f),
+                    outline = onBackground.copy(alpha = 0.4f)
+                )
+            }
         }
         ThemeType.DEFAULT -> {
-            if (darkTheme) DarkColorScheme else LightColorScheme
+            val context = LocalContext.current
+            if (dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            } else {
+                if (darkTheme) DarkColorScheme else LightColorScheme
+            }
         }
     }
 

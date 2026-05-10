@@ -4,6 +4,7 @@ import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -35,7 +36,10 @@ data class Entry(
     val title: String,
     val content: String,
     val mood: Int,
-    val star: Int
+    val star: Int,
+    val photo_urls: List<String> = emptyList(),
+    val voice_memo_urls: List<String> = emptyList(),
+    val view_count: Int = 0
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,8 +49,9 @@ fun MainScreen(navController: NavHostController, storageService: StorageService)
     var searchQuery by remember { mutableStateOf("") }
     var selectedMood by remember { mutableStateOf<Int?>(null) }
     var selectedStar by remember { mutableStateOf<Int?>(null) }
+    var isAscending by remember { mutableStateOf(false) } // Default newest first
     
-    val dataList by storageService.getFilteredEntries(searchQuery, selectedMood, selectedStar)
+    val dataList by storageService.getFilteredEntries(searchQuery, selectedMood, selectedStar, isAscending)
         .collectAsState(initial = emptyList())
         
     var isSearchExpanded by remember { mutableStateOf(false) }
@@ -69,6 +74,13 @@ fun MainScreen(navController: NavHostController, storageService: StorageService)
                         }
                     },
                     actions = {
+                        IconButton(onClick = { isAscending = !isAscending }) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.Sort,
+                                contentDescription = "Sort",
+                                tint = if (isAscending) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                         IconButton(onClick = { navController.navigate(THEME_SCREEN) }) {
                             Icon(Icons.Default.Brush, contentDescription = "Themes")
                         }
@@ -129,7 +141,7 @@ fun MainScreen(navController: NavHostController, storageService: StorageService)
                                 .padding(horizontal = 16.dp),
                             horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            // Mood Dropdown (Combo Box)
+                            // Mood Dropdown
                             ExposedDropdownMenuBox(
                                 expanded = moodExpanded,
                                 onExpandedChange = { moodExpanded = it },
@@ -170,7 +182,7 @@ fun MainScreen(navController: NavHostController, storageService: StorageService)
                                 }
                             }
 
-                            // Star Rating Dropdown (Combo Box)
+                            // Star Rating Dropdown
                             ExposedDropdownMenuBox(
                                 expanded = starExpanded,
                                 onExpandedChange = { starExpanded = it },
