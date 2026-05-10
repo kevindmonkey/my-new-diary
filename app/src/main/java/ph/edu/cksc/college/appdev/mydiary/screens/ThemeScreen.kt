@@ -25,9 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import ph.edu.cksc.college.appdev.mydiary.ui.theme.MyDiaryTheme
 import ph.edu.cksc.college.appdev.mydiary.ui.theme.ThemeType
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,8 +67,11 @@ fun ThemeScreen(
         ) {
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Preview Card
-            ThemePreview(customPrimary, customBackground)
+            // Preview Card - Now correctly using the active theme colors
+            ThemePreview(
+                primary = MaterialTheme.colorScheme.primary,
+                background = MaterialTheme.colorScheme.surface
+            )
 
             Spacer(modifier = Modifier.height(32.dp))
 
@@ -84,7 +89,7 @@ fun ThemeScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             val presets = listOf(
-                PresetOption("System", ThemeType.DEFAULT, Color.LightGray),
+                PresetOption("System", ThemeType.DEFAULT, Color(0xFF4FC3F7)),
                 PresetOption("Dark", ThemeType.DARK, Color(0xFF121212)),
                 PresetOption("Cyber", ThemeType.CYBER, Color(0xFFFFEB3B)),
                 PresetOption("Sakura", ThemeType.SAKURA, Color(0xFFF48FB1)),
@@ -288,3 +293,36 @@ fun ColorPickerGrid(
 }
 
 data class PresetOption(val name: String, val type: ThemeType, val color: Color)
+
+@Preview(showBackground = true)
+@Composable
+fun ThemePreviewDefaultPreview() {
+    MyDiaryTheme(themeType = ThemeType.DEFAULT) {
+        ThemePreview(
+            primary = MaterialTheme.colorScheme.primary,
+            background = MaterialTheme.colorScheme.surface
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ThemePreviewSakuraPreview() {
+    MyDiaryTheme(themeType = ThemeType.SAKURA) {
+        ThemePreview(
+            primary = MaterialTheme.colorScheme.primary,
+            background = MaterialTheme.colorScheme.surface
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun ThemePreviewCyberPreview() {
+    MyDiaryTheme(themeType = ThemeType.CYBER) {
+        ThemePreview(
+            primary = MaterialTheme.colorScheme.primary,
+            background = MaterialTheme.colorScheme.surface
+        )
+    }
+}

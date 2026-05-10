@@ -14,7 +14,9 @@ data class DiaryEntry(
     val star: Int = 1,
     val title: String = "",
     val content: String = "",
-    val dateTime: String = LocalDateTime.now().toString()
+    val dateTime: String = LocalDateTime.now().toString(),
+    val photoUrls: List<String> = emptyList(),
+    val voiceMemoUrls: List<String> = emptyList()
 )
 
 data class Mood(

@@ -96,6 +96,7 @@ fun DiaryEntryScreen(
             DiaryEntryComponent(
                 id = id,
                 viewModel = viewModel,
+                storageService = storageService,
                 onDateClick = { showDatePicker = true },
                 onCancel = { navController.popBackStack() },
                 onSave = {

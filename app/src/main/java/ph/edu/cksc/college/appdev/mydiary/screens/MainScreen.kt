@@ -35,7 +35,9 @@ data class Entry(
     val title: String,
     val content: String,
     val mood: Int,
-    val star: Int
+    val star: Int,
+    val photo_urls: List<String> = emptyList(),
+    val voice_memo_urls: List<String> = emptyList()
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
