@@ -25,16 +25,23 @@ data class NewEntry(
 
 class StorageService(val supabase: SupabaseClient) {
 
-    fun getFilteredEntries(filter: String): Flow<List<DiaryEntry>> {
+    fun getFilteredEntries(filter: String, mood: Int? = null, star: Int? = null): Flow<List<DiaryEntry>> {
         return flow {
             val items = supabase.from("entries")
                 .select() {
                     filter {
-                        or(filter = {
-                            ilike("title", "%$filter%")
-                            ilike("content", "%$filter%")
+                        if (filter.isNotBlank()) {
+                            or(filter = {
+                                ilike("title", "%$filter%")
+                                ilike("content", "%$filter%")
+                            })
                         }
-                        )
+                        if (mood != null) {
+                            eq("mood", mood)
+                        }
+                        if (star != null) {
+                            eq("star", star)
+                        }
                     }
                     order(column = "created_at", order = Order.DESCENDING)
                     limit(20)
@@ -86,7 +93,6 @@ class StorageService(val supabase: SupabaseClient) {
             star = diaryEntry.star
         )
         val result = supabase.from("entries").insert(serialEntry)
-        Log.d("Result", result.data)
         return ""
     }
 
