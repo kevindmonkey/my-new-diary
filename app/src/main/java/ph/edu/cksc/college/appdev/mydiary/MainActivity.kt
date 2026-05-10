@@ -112,6 +112,11 @@ class MainActivity : ComponentActivity() {
                     modified = true
                 }
 
+                override fun onLocationChange(newValue: String) {
+                    diaryEntry.value = diaryEntry.value.copy(location = newValue)
+                    modified = true
+                }
+
                 override fun onDateTimeChange(newValue: LocalDateTime) {
                     diaryEntry.value = diaryEntry.value.copy(dateTime = newValue.toString())
                     modified = true
@@ -178,7 +183,7 @@ class MainActivity : ComponentActivity() {
                         navController = navController
                     ) 
                 }
-                composable(MAIN_SCREEN) { MainScreen(navController, storageService) }
+                composable(MAIN_SCREEN) { MainScreen(navController, storageService, accountService) }
                 composable(ABOUT_SCREEN) { AboutScreen(navController) }
                 composable(LOGIN_SCREEN) { LoginScreen(navController, snackbarHostState, accountService) }
                 composable(REGISTRATION_SCREEN) { RegistrationScreen(navController, snackbarHostState, accountService) }

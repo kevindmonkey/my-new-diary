@@ -25,6 +25,7 @@ data class NewEntry(
     val content: String,
     val mood: Int,
     val star: Int,
+    val location: String? = "",
     val photo_urls: List<String> = emptyList(),
     val voice_memo_urls: List<String> = emptyList(),
     val view_count: Int = 0
@@ -39,6 +40,7 @@ data class EntryUpdate(
     val content: String,
     val mood: Int,
     val star: Int,
+    val location: String? = "",
     val photo_urls: List<String> = emptyList(),
     val voice_memo_urls: List<String> = emptyList(),
     val view_count: Int = 0
@@ -95,6 +97,7 @@ class StorageService(val supabase: SupabaseClient) {
                         star = entry.star,
                         title = entry.title,
                         content = entry.content,
+                        location = entry.location ?: "",
                         dateTime = entry.created_at.toLocalDateTime(TimeZone.currentSystemDefault()).toString(),
                         photoUrls = entry.photo_urls,
                         voiceMemoUrls = entry.voice_memo_urls,
@@ -122,6 +125,7 @@ class StorageService(val supabase: SupabaseClient) {
                 star = entry.star,
                 title = entry.title,
                 content = entry.content,
+                location = entry.location ?: "",
                 dateTime = entry.created_at.toLocalDateTime(TimeZone.currentSystemDefault()).toString(),
                 photoUrls = entry.photo_urls,
                 voiceMemoUrls = entry.voice_memo_urls,
@@ -152,6 +156,7 @@ class StorageService(val supabase: SupabaseClient) {
             content =  diaryEntry.content,
             mood = diaryEntry.mood,
             star = diaryEntry.star,
+            location = diaryEntry.location,
             photo_urls = diaryEntry.photoUrls,
             voice_memo_urls = diaryEntry.voiceMemoUrls,
             view_count = 0
@@ -172,6 +177,7 @@ class StorageService(val supabase: SupabaseClient) {
             content =  diaryEntry.content,
             mood = diaryEntry.mood,
             star = diaryEntry.star,
+            location = diaryEntry.location,
             photo_urls = diaryEntry.photoUrls,
             voice_memo_urls = diaryEntry.voiceMemoUrls,
             view_count = diaryEntry.viewCount

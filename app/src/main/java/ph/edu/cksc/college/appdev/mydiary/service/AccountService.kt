@@ -14,7 +14,7 @@ class AccountService(val supabase: SupabaseClient) {
 
     suspend fun signInUser(email: String, password: String): String {
         try {
-            val result = supabase.auth.signInWith(Email) {
+            supabase.auth.signInWith(Email) {
                 this.email = email
                 this.password = password
             }
@@ -50,6 +50,15 @@ class AccountService(val supabase: SupabaseClient) {
             Log.e("Sign up", error, e)
             println("Sign-up failed: ${error}")
             return error
+        }
+    }
+
+    suspend fun signOut() {
+        try {
+            supabase.auth.signOut()
+            userSession = null
+        } catch (e: Exception) {
+            Log.e("Logout", "Logout failed", e)
         }
     }
 }

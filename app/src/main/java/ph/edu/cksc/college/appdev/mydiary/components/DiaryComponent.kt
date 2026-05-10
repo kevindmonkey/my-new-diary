@@ -1,5 +1,8 @@
 package ph.edu.cksc.college.appdev.mydiary.components
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -8,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.Photo
 import androidx.compose.material.icons.filled.Star
@@ -18,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -31,6 +36,7 @@ import coil.compose.AsyncImage
 import ph.edu.cksc.college.appdev.mydiary.DIARY_ENTRY_SCREEN
 import ph.edu.cksc.college.appdev.mydiary.diary.DiaryEntry
 import ph.edu.cksc.college.appdev.mydiary.diary.moodList
+import java.net.URLEncoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -39,6 +45,7 @@ fun DiaryEntryCard(
     entry: DiaryEntry,
     navController: NavHostController
 ) {
+    val context = LocalContext.current
     var isExpanded by remember { mutableStateOf(false) }
     val formatter = DateTimeFormatter.ofPattern("MMM d, yyyy • h:mm a")
     val date = try { LocalDateTime.parse(entry.dateTime) } catch(e: Exception) { LocalDateTime.now() }
@@ -99,8 +106,48 @@ fun DiaryEntryCard(
                 }
             }
 
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Location Chip - Positioned near images/content
+            if (entry.location.isNotBlank()) {
+                Surface(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    shape = RoundedCornerShape(4.dp),
+                    modifier = Modifier.clickable {
+                        try {
+                            val gmmIntentUri = Uri.parse("geo:0,0?q=${URLEncoder.encode(entry.location, "UTF-8")}")
+                            val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                            mapIntent.setPackage("com.google.android.apps.maps")
+                            context.startActivity(mapIntent)
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "Google Maps not found", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(
+                            entry.location,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+
             if (entry.photoUrls.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(12.dp))
                 LazyRow(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     modifier = Modifier.fillMaxWidth()
@@ -116,9 +163,8 @@ fun DiaryEntryCard(
                         )
                     }
                 }
+                Spacer(modifier = Modifier.height(12.dp))
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = parseHtmlToAnnotatedString(entry.content),

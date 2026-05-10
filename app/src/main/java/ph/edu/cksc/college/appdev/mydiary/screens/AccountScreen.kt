@@ -1,48 +1,24 @@
 package ph.edu.cksc.college.appdev.mydiary.screens
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.user.UserSession
@@ -64,7 +40,6 @@ data class Profile (
 fun getSession(): String {
     try {
         val session: UserSession? = supabase.auth.currentSessionOrNull()
-        // userSession is defined in LoginScreen.kt (same package)
         userSession = session
         return "Success"
     } catch (e: Exception) {
@@ -81,10 +56,9 @@ fun AccountScreen(
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color.Transparent,
                 ),
-                title = { Text("Account") },
+                title = { },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
@@ -93,88 +67,83 @@ fun AccountScreen(
             )
         },
     ) { innerPadding ->
-        AccountScrollContent(innerPadding, navController)
-    }
-}
-
-@Composable
-fun AccountScrollContent(
-    innerPadding: PaddingValues,
-    navController: NavHostController
-) {
-    val scope = rememberCoroutineScope()
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.ic_launcher_foreground),
-            contentDescription = "App Icon",
+        Column(
             modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF00B5FF))
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "My Diary",
-            style = MaterialTheme.typography.displaySmall,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-        Text(
-            text = "Keep your memories safe",
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.outline,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { navController.navigate(LOGIN_SCREEN) }
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            Text("Login")
-        }
+            // App Logo - Using Icon directly without any Surface or background circle so it blends perfectly
+            Icon(
+                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                contentDescription = "App Icon",
+                modifier = Modifier.size(140.dp),
+                tint = MaterialTheme.colorScheme.primary
+            )
 
-        Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { navController.navigate(REGISTRATION_SCREEN) }
-        ) {
-            Text("Create Account")
-        }
+            Text(
+                text = "My Diary",
+                style = MaterialTheme.typography.displayMedium,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.primary,
+                letterSpacing = (-1).sp
+            )
+            Text(
+                text = "Capture your thoughts, preserve your soul.",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 8.dp)
+            )
 
-        Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(56.dp))
 
-        Text(
-            modifier = Modifier.clickable {
-                scope.launch {
-                    val result = getSession()
-                    if (result == "Success") navController.navigate(MAIN_SCREEN)
-                }
-            }.padding(8.dp),
-            text = "Already signed in? Resume here",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Medium
-        )
+            val scope = rememberCoroutineScope()
 
-        Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                onClick = { navController.navigate(LOGIN_SCREEN) },
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text("Sign In", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            }
 
-        OutlinedButton(
-            modifier = Modifier.fillMaxWidth(),
-            onClick = { scope.launch { supabase.auth.signOut() } }
-        ) {
-            Text("Log out")
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedButton(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(56.dp),
+                onClick = { navController.navigate(REGISTRATION_SCREEN) },
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Text("Create New Account", style = MaterialTheme.typography.titleMedium)
+            }
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            Text(
+                modifier = Modifier.clickable {
+                    scope.launch {
+                        val result = getSession()
+                        if (result == "Success" && userSession != null) {
+                            navController.navigate(MAIN_SCREEN) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    }
+                }.padding(8.dp),
+                text = "Resume Session",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }

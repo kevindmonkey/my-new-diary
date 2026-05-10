@@ -12,6 +12,7 @@ interface DiaryEntryViewModel {
     fun onContentChange(newValue: String)
     fun onMoodChange(newValue: Int)
     fun onStarChange(newValue: Int)
+    fun onLocationChange(newValue: String)
     fun onDateTimeChange(newValue: LocalDateTime)
     fun onAddPhoto(url: String)
     fun onRemovePhoto(url: String)

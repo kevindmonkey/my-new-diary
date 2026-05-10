@@ -1,26 +1,37 @@
 package ph.edu.cksc.college.appdev.mydiary.screens
 
+import android.app.Activity
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import ph.edu.cksc.college.appdev.mydiary.ABOUT_SCREEN
+import ph.edu.cksc.college.appdev.mydiary.ACCOUNT_SCREEN
 import ph.edu.cksc.college.appdev.mydiary.DIARY_ENTRY_SCREEN
 import ph.edu.cksc.college.appdev.mydiary.THEME_SCREEN
 import ph.edu.cksc.college.appdev.mydiary.components.DiaryList
 import ph.edu.cksc.college.appdev.mydiary.diary.moodList
 import ph.edu.cksc.college.appdev.mydiary.diary.starList
+import ph.edu.cksc.college.appdev.mydiary.service.AccountService
 import ph.edu.cksc.college.appdev.mydiary.service.StorageService
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(navController: NavHostController, storageService: StorageService) {
+fun MainScreen(
+    navController: NavHostController, 
+    storageService: StorageService,
+    accountService: AccountService
+) {
+    val scope = rememberCoroutineScope()
     var searchQuery by remember { mutableStateOf("") }
     var selectedMood by remember { mutableStateOf<Int?>(null) }
     var selectedStar by remember { mutableStateOf<Int?>(null) }
@@ -96,6 +107,23 @@ fun MainScreen(navController: NavHostController, storageService: StorageService)
                                         navController.navigate(ABOUT_SCREEN) 
                                     },
                                     leadingIcon = { Icon(Icons.Default.Info, null) }
+                                )
+                                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+                                DropdownMenuItem(
+                                    text = { Text("Logout") },
+                                    onClick = { 
+                                        showMenu = false
+                                        scope.launch {
+                                            accountService.signOut()
+                                            navController.navigate(ACCOUNT_SCREEN) {
+                                                popUpTo(0) { inclusive = true }
+                                            }
+                                        }
+                                    },
+                                    leadingIcon = { Icon(Icons.AutoMirrored.Filled.Logout, null, tint = MaterialTheme.colorScheme.error) },
+                                    colors = MenuDefaults.itemColors(
+                                        textColor = MaterialTheme.colorScheme.error
+                                    )
                                 )
                             }
                         }

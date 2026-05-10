@@ -1,6 +1,7 @@
 package ph.edu.cksc.college.appdev.mydiary.components
 
 import android.Manifest
+import android.content.Intent
 import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.LocationOn
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Photo
 import androidx.compose.material.icons.outlined.Visibility
@@ -42,6 +44,7 @@ import ph.edu.cksc.college.appdev.mydiary.diary.moodList
 import ph.edu.cksc.college.appdev.mydiary.diary.starList
 import ph.edu.cksc.college.appdev.mydiary.service.StorageService
 import java.io.File
+import java.net.URLEncoder
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -241,6 +244,52 @@ fun DiaryEntryComponent(
                     onStarSelected = { viewModel.onStarChange(it) },
                     enabled = isEditing
                 )
+            }
+
+            // Location Section
+            Spacer(modifier = Modifier.height(16.dp))
+            if (isEditing) {
+                OutlinedTextField(
+                    value = entry.location,
+                    onValueChange = { viewModel.onLocationChange(it) },
+                    placeholder = { Text("Add location...") },
+                    leadingIcon = { Icon(Icons.Outlined.LocationOn, null) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        unfocusedBorderColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+                    )
+                )
+            } else if (entry.location.isNotBlank()) {
+                Surface(
+                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.clickable {
+                        val gmmIntentUri = Uri.parse("geo:0,0?q=${URLEncoder.encode(entry.location, "UTF-8")}")
+                        val mapIntent = Intent(Intent.ACTION_VIEW, gmmIntentUri)
+                        mapIntent.setPackage("com.google.android.apps.maps")
+                        context.startActivity(mapIntent)
+                    }
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            Icons.Default.LocationOn,
+                            null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            entry.location,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(24.dp))

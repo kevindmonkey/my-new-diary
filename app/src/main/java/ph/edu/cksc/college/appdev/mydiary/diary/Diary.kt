@@ -16,6 +16,7 @@ data class DiaryEntry(
     val title: String = "",
     val content: String = "",
     val dateTime: String = LocalDateTime.now().toString(),
+    val location: String = "",
     val photoUrls: List<String> = emptyList(),
     val voiceMemoUrls: List<String> = emptyList(),
     val viewCount: Int = 0
