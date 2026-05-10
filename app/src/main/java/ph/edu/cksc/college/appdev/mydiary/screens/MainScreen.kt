@@ -38,12 +38,8 @@ data class Entry(
     val mood: Int,
     val star: Int,
     val photo_urls: List<String> = emptyList(),
-<<<<<<< HEAD
     val voice_memo_urls: List<String> = emptyList(),
     val view_count: Int = 0
-=======
-    val voice_memo_urls: List<String> = emptyList()
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,10 +50,10 @@ fun MainScreen(navController: NavHostController, storageService: StorageService)
     var selectedMood by remember { mutableStateOf<Int?>(null) }
     var selectedStar by remember { mutableStateOf<Int?>(null) }
     var isAscending by remember { mutableStateOf(false) } // Default newest first
-    
+
     val dataList by storageService.getFilteredEntries(searchQuery, selectedMood, selectedStar, isAscending)
         .collectAsState(initial = emptyList())
-        
+
     var isSearchExpanded by remember { mutableStateOf(false) }
     var moodExpanded by remember { mutableStateOf(false) }
     var starExpanded by remember { mutableStateOf(false) }
@@ -88,8 +84,8 @@ fun MainScreen(navController: NavHostController, storageService: StorageService)
                         IconButton(onClick = { navController.navigate(THEME_SCREEN) }) {
                             Icon(Icons.Default.Brush, contentDescription = "Themes")
                         }
-                        IconButton(onClick = { 
-                            isSearchExpanded = !isSearchExpanded 
+                        IconButton(onClick = {
+                            isSearchExpanded = !isSearchExpanded
                             if (!isSearchExpanded) {
                                 searchQuery = ""
                                 selectedMood = null
@@ -136,9 +132,9 @@ fun MainScreen(navController: NavHostController, storageService: StorageService)
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                             )
                         ) {}
-                        
+
                         Spacer(modifier = Modifier.height(8.dp))
-                        
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()

@@ -33,7 +33,7 @@ fun DiaryEntryScreen(
 ) {
     val context = LocalContext.current
     val entry by viewModel.diaryEntry
-    
+
     // New state for Edit vs View mode
     var isEditing by remember { mutableStateOf(id.isEmpty() || id == "null") }
 
@@ -84,11 +84,11 @@ fun DiaryEntryScreen(
                     )
                 },
                 navigationIcon = {
-                    IconButton(onClick = { 
+                    IconButton(onClick = {
                         if (isEditing && id.isNotEmpty() && id != "null") {
                             isEditing = false // Go back to viewing
                         } else {
-                            navController.popBackStack() 
+                            navController.popBackStack()
                         }
                     }) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
@@ -116,20 +116,15 @@ fun DiaryEntryScreen(
                 id = id,
                 viewModel = viewModel,
                 storageService = storageService,
-<<<<<<< HEAD
                 isEditing = isEditing, // Pass isEditing state
                 onDateClick = { if (isEditing) showDatePicker = true },
-                onCancel = { 
+                onCancel = {
                     if (id.isEmpty() || id == "null") {
                         navController.popBackStack()
                     } else {
                         isEditing = false
                     }
                 },
-=======
-                onDateClick = { showDatePicker = true },
-                onCancel = { navController.popBackStack() },
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                 onSave = {
                     viewModel.onDoneClick {
                         Toast.makeText(context, "Entry saved successfully", Toast.LENGTH_SHORT).show()

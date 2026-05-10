@@ -15,10 +15,6 @@ import kotlinx.datetime.toInstant
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.serialization.Serializable
 import ph.edu.cksc.college.appdev.mydiary.diary.DiaryEntry
-<<<<<<< HEAD
-=======
-import ph.edu.cksc.college.appdev.mydiary.screens.Entry
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
 import java.util.UUID
 
 @Serializable
@@ -30,12 +26,8 @@ data class NewEntry(
     val mood: Int,
     val star: Int,
     val photo_urls: List<String> = emptyList(),
-<<<<<<< HEAD
     val voice_memo_urls: List<String> = emptyList(),
     val view_count: Int = 0
-=======
-    val voice_memo_urls: List<String> = emptyList()
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
 )
 
 @Serializable
@@ -48,12 +40,8 @@ data class EntryUpdate(
     val mood: Int,
     val star: Int,
     val photo_urls: List<String> = emptyList(),
-<<<<<<< HEAD
     val voice_memo_urls: List<String> = emptyList(),
     val view_count: Int = 0
-=======
-    val voice_memo_urls: List<String> = emptyList()
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
 )
 
 class StorageService(val supabase: SupabaseClient) {
@@ -63,37 +51,22 @@ class StorageService(val supabase: SupabaseClient) {
 
     private fun String.toInstantSafe(): Instant {
         return try {
-<<<<<<< HEAD
             Instant.parse(this)
         } catch (e: Exception) {
             try {
                 LocalDateTime.parse(this).toInstant(TimeZone.UTC)
             } catch (e2: Exception) {
-=======
-            // Try parsing as Instant first
-            Instant.parse(this)
-        } catch (e: Exception) {
-            try {
-                // Try parsing as LocalDateTime and converting
-                LocalDateTime.parse(this).toInstant(TimeZone.UTC)
-            } catch (e2: Exception) {
-                // Fallback to now
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                 kotlinx.datetime.Clock.System.now()
             }
         }
     }
 
-<<<<<<< HEAD
     fun getFilteredEntries(
         filter: String, 
         mood: Int? = null, 
         star: Int? = null,
         ascending: Boolean = false
     ): Flow<List<DiaryEntry>> {
-=======
-    fun getFilteredEntries(filter: String, mood: Int? = null, star: Int? = null): Flow<List<DiaryEntry>> {
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
         return flow {
             try {
                 val items = supabase.from("entries")
@@ -112,20 +85,11 @@ class StorageService(val supabase: SupabaseClient) {
                                 eq("star", star)
                             }
                         }
-<<<<<<< HEAD
                         order(column = "created_at", order = if (ascending) Order.ASCENDING else Order.DESCENDING)
                         limit(50)
                     }.decodeList<EntryUpdate>()
                 val list = items.map { entry ->
                     DiaryEntry(
-=======
-                        order(column = "created_at", order = Order.DESCENDING)
-                        limit(20)
-                    }.decodeList<EntryUpdate>()
-                val list: MutableList<DiaryEntry> = ArrayList()
-                for (entry in items) {
-                    val item = DiaryEntry(
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                         id = entry.id,
                         mood = entry.mood,
                         star = entry.star,
@@ -133,15 +97,9 @@ class StorageService(val supabase: SupabaseClient) {
                         content = entry.content,
                         dateTime = entry.created_at.toLocalDateTime(TimeZone.currentSystemDefault()).toString(),
                         photoUrls = entry.photo_urls,
-<<<<<<< HEAD
                         voiceMemoUrls = entry.voice_memo_urls,
                         viewCount = entry.view_count
                     )
-=======
-                        voiceMemoUrls = entry.voice_memo_urls
-                    )
-                    list.add(item)
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                 }
                 emit(list)
             } catch (e: Exception) {
@@ -166,12 +124,8 @@ class StorageService(val supabase: SupabaseClient) {
                 content = entry.content,
                 dateTime = entry.created_at.toLocalDateTime(TimeZone.currentSystemDefault()).toString(),
                 photoUrls = entry.photo_urls,
-<<<<<<< HEAD
                 voiceMemoUrls = entry.voice_memo_urls,
                 viewCount = entry.view_count
-=======
-                voiceMemoUrls = entry.voice_memo_urls
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
             )
         } catch (e: Exception) {
             Log.e("StorageService", "Error getting entry", e)
@@ -199,12 +153,8 @@ class StorageService(val supabase: SupabaseClient) {
             mood = diaryEntry.mood,
             star = diaryEntry.star,
             photo_urls = diaryEntry.photoUrls,
-<<<<<<< HEAD
             voice_memo_urls = diaryEntry.voiceMemoUrls,
             view_count = 0
-=======
-            voice_memo_urls = diaryEntry.voiceMemoUrls
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
         )
         supabase.from("entries").insert(serialEntry)
         return ""
@@ -221,12 +171,8 @@ class StorageService(val supabase: SupabaseClient) {
             mood = diaryEntry.mood,
             star = diaryEntry.star,
             photo_urls = diaryEntry.photoUrls,
-<<<<<<< HEAD
             voice_memo_urls = diaryEntry.voiceMemoUrls,
             view_count = diaryEntry.viewCount
-=======
-            voice_memo_urls = diaryEntry.voiceMemoUrls
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
         )
         supabase.from("entries").update(serialEntry) {
             filter {

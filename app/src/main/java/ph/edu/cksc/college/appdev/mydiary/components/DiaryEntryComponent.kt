@@ -22,10 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Photo
-<<<<<<< HEAD
 import androidx.compose.material.icons.outlined.Visibility
-=======
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -37,11 +34,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-<<<<<<< HEAD
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-=======
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import ph.edu.cksc.college.appdev.mydiary.diary.moodList
@@ -58,10 +52,7 @@ fun DiaryEntryComponent(
     id: String,
     viewModel: DiaryEntryViewModel,
     storageService: StorageService,
-<<<<<<< HEAD
     isEditing: Boolean,
-=======
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
     onDateClick: () -> Unit,
     onCancel: () -> Unit,
     onSave: () -> Unit
@@ -69,17 +60,14 @@ fun DiaryEntryComponent(
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val entry by viewModel.diaryEntry
-    
+
     val displayFormatter = DateTimeFormatter.ofPattern("EEEE, MMMM d, yyyy")
     val timeFormatter = DateTimeFormatter.ofPattern("h:mm a")
     val date = try { LocalDateTime.parse(entry.dateTime) } catch (e: Exception) { LocalDateTime.now() }
 
-<<<<<<< HEAD
     // Enlarge photo state
     var enlargedImageUrl by remember { mutableStateOf<String?>(null) }
 
-=======
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
     // Media picking logic
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -123,7 +111,6 @@ fun DiaryEntryComponent(
         }
     }
 
-<<<<<<< HEAD
     // Fullscreen Image Dialog
     enlargedImageUrl?.let { url ->
         Dialog(
@@ -155,8 +142,6 @@ fun DiaryEntryComponent(
         }
     }
 
-=======
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
     Column(modifier = Modifier.fillMaxSize()) {
         // Scrollable Content Area
         Column(
@@ -166,7 +151,6 @@ fun DiaryEntryComponent(
                 .padding(horizontal = 24.dp, vertical = 16.dp),
         ) {
             // Subtle Date Header
-<<<<<<< HEAD
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -190,12 +174,12 @@ fun DiaryEntryComponent(
                         modifier = Modifier.padding(top = 2.dp)
                     )
                 }
-                
+
                 // View Counter
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        Icons.Outlined.Visibility, 
-                        null, 
+                        Icons.Outlined.Visibility,
+                        null,
                         tint = MaterialTheme.colorScheme.outline,
                         modifier = Modifier.size(16.dp)
                     )
@@ -206,26 +190,6 @@ fun DiaryEntryComponent(
                         color = MaterialTheme.colorScheme.outline
                     )
                 }
-=======
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onDateClick() }
-            ) {
-                Text(
-                    text = date.format(displayFormatter).uppercase(),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold,
-                    letterSpacing = 1.sp
-                )
-                Text(
-                    text = date.format(timeFormatter),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.outline,
-                    modifier = Modifier.padding(top = 2.dp)
-                )
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -234,16 +198,13 @@ fun DiaryEntryComponent(
             TextField(
                 value = entry.title,
                 onValueChange = { viewModel.onTitleChange(it) },
-<<<<<<< HEAD
                 readOnly = !isEditing,
-=======
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
-                placeholder = { 
+                placeholder = {
                     Text(
-                        "Entry Title", 
+                        "Entry Title",
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.4f)
-                    ) 
+                    )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -271,22 +232,14 @@ fun DiaryEntryComponent(
             ) {
                 MoodSelectorChip(
                     selectedMoodIndex = entry.mood,
-<<<<<<< HEAD
                     onMoodSelected = { viewModel.onMoodChange(it) },
                     enabled = isEditing
-=======
-                    onMoodSelected = { viewModel.onMoodChange(it) }
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                 )
-                
+
                 StarSelectorChip(
                     selectedStars = entry.star,
-<<<<<<< HEAD
                     onStarSelected = { viewModel.onStarChange(it) },
                     enabled = isEditing
-=======
-                    onStarSelected = { viewModel.onStarChange(it) }
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                 )
             }
 
@@ -296,16 +249,13 @@ fun DiaryEntryComponent(
             TextField(
                 value = entry.content,
                 onValueChange = { viewModel.onContentChange(it) },
-<<<<<<< HEAD
                 readOnly = !isEditing,
-=======
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
-                placeholder = { 
+                placeholder = {
                     Text(
-                        "Start writing here...", 
+                        "Start writing here...",
                         style = MaterialTheme.typography.bodyLarge,
                         color = MaterialTheme.colorScheme.outline.copy(alpha = 0.6f)
-                    ) 
+                    )
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -340,7 +290,6 @@ fun DiaryEntryComponent(
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(120.dp)
-<<<<<<< HEAD
                                     .clip(RoundedCornerShape(12.dp))
                                     .clickable { enlargedImageUrl = url }, // Enlarging on click
                                 contentScale = ContentScale.Crop
@@ -355,19 +304,6 @@ fun DiaryEntryComponent(
                                 ) {
                                     Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(16.dp))
                                 }
-=======
-                                    .clip(RoundedCornerShape(12.dp)),
-                                contentScale = ContentScale.Crop
-                            )
-                            IconButton(
-                                onClick = { viewModel.onRemovePhoto(url) },
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .size(24.dp)
-                                    .background(Color.Black.copy(alpha = 0.5f), CircleShape)
-                            ) {
-                                Icon(Icons.Default.Close, null, tint = Color.White, modifier = Modifier.size(16.dp))
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                             }
                         }
                     }
@@ -401,7 +337,7 @@ fun DiaryEntryComponent(
                                             setDataSource(url)
                                             prepareAsync()
                                             setOnPreparedListener { start() }
-                                            setOnCompletionListener { 
+                                            setOnCompletionListener {
                                                 playingUrl = null
                                                 it.release()
                                                 if (mediaPlayer == it) mediaPlayer = null
@@ -411,34 +347,28 @@ fun DiaryEntryComponent(
                                     }
                                 }) {
                                     Icon(
-                                        if (playingUrl == url) Icons.Default.Stop else Icons.Default.PlayArrow, 
-                                        null, 
+                                        if (playingUrl == url) Icons.Default.Stop else Icons.Default.PlayArrow,
+                                        null,
                                         tint = MaterialTheme.colorScheme.primary
                                     )
                                 }
                                 Spacer(Modifier.width(4.dp))
                                 Text("Voice Memo ${index + 1}", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-<<<<<<< HEAD
                                 if (isEditing) {
                                     IconButton(onClick = { viewModel.onRemoveVoiceMemo(url) }) {
                                         Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
                                     }
-=======
-                                IconButton(onClick = { viewModel.onRemoveVoiceMemo(url) }) {
-                                    Icon(Icons.Default.Delete, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(20.dp))
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                                 }
                             }
                         }
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(32.dp))
         }
 
         // Clean Bottom Action Box
-<<<<<<< HEAD
         if (isEditing) {
             Surface(
                 tonalElevation = 2.dp,
@@ -501,8 +431,8 @@ fun DiaryEntryComponent(
                                     }
                                 ) {
                                     Icon(
-                                        if (isRecording) Icons.Default.Stop else Icons.Outlined.Mic, 
-                                        contentDescription = "Voice Memo", 
+                                        if (isRecording) Icons.Default.Stop else Icons.Outlined.Mic,
+                                        contentDescription = "Voice Memo",
                                         tint = if (isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
                                     )
                                 }
@@ -515,7 +445,7 @@ fun DiaryEntryComponent(
                         TextButton(onClick = onCancel) {
                             Text("Cancel", color = MaterialTheme.colorScheme.outline)
                         }
-                        
+
                         Spacer(modifier = Modifier.width(8.dp))
 
                         Button(
@@ -527,94 +457,6 @@ fun DiaryEntryComponent(
                             Spacer(Modifier.width(8.dp))
                             Text("Save")
                         }
-=======
-        Surface(
-            tonalElevation = 2.dp,
-            shadowElevation = 8.dp,
-            color = MaterialTheme.colorScheme.surface,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Column {
-                HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 12.dp)
-                        .navigationBarsPadding()
-                        .imePadding(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Attachment Buttons (The "Bottom Box" icons)
-                    Surface(
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(12.dp)
-                    ) {
-                        Row(modifier = Modifier.padding(horizontal = 4.dp)) {
-                            IconButton(onClick = { photoPickerLauncher.launch("image/*") }) {
-                                Icon(Icons.Outlined.Photo, contentDescription = "Add Photo", tint = MaterialTheme.colorScheme.primary)
-                            }
-                            IconButton(
-                                onClick = {
-                                    if (isRecording) {
-                                        recorder?.apply {
-                                            stop()
-                                            release()
-                                        }
-                                        recorder = null
-                                        isRecording = false
-                                        scope.launch {
-                                            recordFile?.let { file ->
-                                                val url = storageService.uploadAudio(file.readBytes())
-                                                viewModel.onAddVoiceMemo(url)
-                                            }
-                                        }
-                                    } else {
-                                        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-                                        val file = File(context.cacheDir, "memo_${System.currentTimeMillis()}.m4a")
-                                        recordFile = file
-                                        recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                            MediaRecorder(context)
-                                        } else {
-                                            @Suppress("DEPRECATION")
-                                            MediaRecorder()
-                                        }.apply {
-                                            setAudioSource(MediaRecorder.AudioSource.MIC)
-                                            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-                                            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-                                            setOutputFile(file.absolutePath)
-                                            prepare()
-                                            start()
-                                        }
-                                        isRecording = true
-                                    }
-                                }
-                            ) {
-                                Icon(
-                                    if (isRecording) Icons.Default.Stop else Icons.Outlined.Mic, 
-                                    contentDescription = "Voice Memo", 
-                                    tint = if (isRecording) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    // Core Actions
-                    TextButton(onClick = onCancel) {
-                        Text("Discard", color = MaterialTheme.colorScheme.outline)
-                    }
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-
-                    Button(
-                        onClick = onSave,
-                        shape = RoundedCornerShape(12.dp),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
-                    ) {
-                        Icon(Icons.Default.Done, null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Save")
->>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                     }
                 }
             }
@@ -661,7 +503,7 @@ fun MoodSelectorChip(
         ) {
             moodList.forEachIndexed { index, item ->
                 DropdownMenuItem(
-                    text = { 
+                    text = {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(item.icon, null, tint = item.color, modifier = Modifier.size(18.dp))
                             Spacer(Modifier.width(10.dp))
