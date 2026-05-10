@@ -16,8 +16,12 @@ data class DiaryEntry(
     val content: String = "",
     val dateTime: String = LocalDateTime.now().toString(),
     val photoUrls: List<String> = emptyList(),
+<<<<<<< HEAD
     val voiceMemoUrls: List<String> = emptyList(),
     val viewCount: Int = 0
+=======
+    val voiceMemoUrls: List<String> = emptyList()
+>>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
 )
 
 data class Mood(

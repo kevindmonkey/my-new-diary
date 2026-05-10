@@ -38,8 +38,12 @@ data class Entry(
     val mood: Int,
     val star: Int,
     val photo_urls: List<String> = emptyList(),
+<<<<<<< HEAD
     val voice_memo_urls: List<String> = emptyList(),
     val view_count: Int = 0
+=======
+    val voice_memo_urls: List<String> = emptyList()
+>>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
 )
 
 @OptIn(ExperimentalMaterial3Api::class)

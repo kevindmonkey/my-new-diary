@@ -116,6 +116,7 @@ fun DiaryEntryScreen(
                 id = id,
                 viewModel = viewModel,
                 storageService = storageService,
+<<<<<<< HEAD
                 isEditing = isEditing, // Pass isEditing state
                 onDateClick = { if (isEditing) showDatePicker = true },
                 onCancel = { 
@@ -125,6 +126,10 @@ fun DiaryEntryScreen(
                         isEditing = false
                     }
                 },
+=======
+                onDateClick = { showDatePicker = true },
+                onCancel = { navController.popBackStack() },
+>>>>>>> 2936fe9880000f9f6eb12bdd7d3e7cd1f9736b60
                 onSave = {
                     viewModel.onDoneClick {
                         Toast.makeText(context, "Entry saved successfully", Toast.LENGTH_SHORT).show()
