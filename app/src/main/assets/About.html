@@ -4,108 +4,118 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>About CKSC Chronicles</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #6750A4;
+            --surface-color: transparent;
+            --on-surface: #1C1B1F;
+            --secondary-container: #EADDFF;
+            --on-secondary-container: #21005D;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #D0BCFF;
+                --on-surface: #E6E1E5;
+                --secondary-container: #4F378B;
+                --on-secondary-container: #EADDFF;
+            }
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #fcfaff; /* Light purple tint */
-            color: #333;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--surface-color);
+            color: var(--on-surface);
             margin: 0;
-            padding: 20px;
-            line-height: 1.6;
+            padding: 16px;
+            line-height: 1.5;
         }
         .container {
             max-width: 600px;
             margin: auto;
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
         h1 {
-            color: #6750A4; /* Matches Android Purple */
-            font-size: 24px;
-            margin-bottom: 10px;
-            text-align: center;
+            color: var(--primary-color);
+            font-size: 28px;
+            margin-bottom: 8px;
+            font-weight: 700;
         }
         .description {
-            font-size: 15px;
-            color: #555;
-            text-align: center;
-            margin-bottom: 30px;
+            font-size: 16px;
+            margin-bottom: 24px;
+            opacity: 0.8;
         }
         .section-title {
             font-weight: 600;
-            font-size: 18px;
-            border-bottom: 2px solid #eaddff;
-            padding-bottom: 5px;
-            margin-top: 20px;
-        }
-        .team-grid {
-            margin-top: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-top: 24px;
+            margin-bottom: 12px;
+            color: var(--primary-color);
         }
         .member {
-            background: #f6edff;
-            padding: 10px 15px;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            background: var(--secondary-container);
+            color: var(--on-secondary-container);
+            padding: 12px 16px;
+            border-radius: 12px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         .member span {
             font-weight: 600;
-            color: #21005d;
         }
         .role {
-            font-size: 12px;
-            color: #6750a4;
-            background: #fff;
-            padding: 2px 8px;
-            border-radius: 5px;
-            text-transform: uppercase;
+            font-size: 11px;
+            opacity: 0.7;
+            font-weight: 700;
         }
         .footer {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px;
+            padding-bottom: 20px;
         }
         #logo {
-            width: 80px;
-            opacity: 0.8;
+            width: 64px;
+            margin-bottom: 16px;
+        }
+        .version {
+            font-size: 12px;
+            opacity: 0.5;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>CKSC CHRONICLES</h1>
+    <h1>CKSC Chronicles</h1>
     <p class="description">
-        A premium digital journal designed to capture your daily experiences,
-        emotional trends, and precious life in one secure place.
+        A modern digital diary built for simplicity and reflection.
+        Keep your thoughts organized, track your moods, and preserve your memories securely.
     </p>
 
     <div class="section-title">Development Team</div>
-    <div class="team-grid">
-        <div class="member">
-            <span>Athrone Yael Rosal</span>
-            <div class="role">UI/DESIGN</div>
-        </div>
-        <div class="member">
-            <span>John Kevin Mendoza</span>
-            <div class="role">LEAD DEVELOPER</div>
-        </div>
-        <div class="member">
-            <span>Hong Mingcharm</span>
-            <div class="role">DEVELOPER</div>
-        </div>
+    <div class="member">
+        <span>Athrone Yael Rosal</span>
+        <div class="role">UI/DESIGN</div>
+    </div>
+    <div class="member">
+        <span>John Kevin Mendoza</span>
+        <div class="role">LEAD DEVELOPER</div>
+    </div>
+    <div class="member">
+        <span>Hong Mingcharm</span>
+        <div class="role">DEVELOPER</div>
     </div>
 
-    <div class="section-title">Version</div>
-    <p style="font-size: 14px;">1.0.0 (Stable Build)</p>
+    <div class="section-title">App Info</div>
+    <p class="version">Version 1.0.0 (Stable)</p>
 
     <div class="footer">
         <img id='logo' src='SVG_Logo.svg' alt='Logo'>
-        <p style="font-size: 12px; color: #aaa;">&copy; 2026 App Dev Demo Project</p>
+        <p style="font-size: 11px; opacity: 0.6;">&copy; 2026 App Dev Project</p>
     </div>
 </div>
 

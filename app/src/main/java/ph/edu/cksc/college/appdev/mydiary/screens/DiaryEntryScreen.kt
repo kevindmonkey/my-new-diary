@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavHostController
+import kotlinx.coroutines.launch
 import ph.edu.cksc.college.appdev.mydiary.components.DateDialog
 import ph.edu.cksc.college.appdev.mydiary.components.DiaryEntryComponent
 import ph.edu.cksc.college.appdev.mydiary.components.DiaryEntryViewModel
@@ -32,10 +34,12 @@ fun DiaryEntryScreen(
     storageService: StorageService
 ) {
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
     val entry by viewModel.diaryEntry
 
     // New state for Edit vs View mode
     var isEditing by remember { mutableStateOf(id.isEmpty() || id == "null") }
+    var showDeleteDialog by remember { mutableStateOf(false) }
 
     // Logic to load data if ID exists (Edit Mode) or clear state (Add Mode)
     LaunchedEffect(id) {
@@ -99,6 +103,13 @@ fun DiaryEntryScreen(
                         IconButton(onClick = { isEditing = true }) {
                             Icon(Icons.Default.Edit, "Edit")
                         }
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete",
+                                tint = MaterialTheme.colorScheme.error
+                            )
+                        }
                     } else {
                         IconButton(onClick = { showDatePicker = true }) {
                             Icon(Icons.Filled.DateRange, "Date")
@@ -133,6 +144,38 @@ fun DiaryEntryScreen(
                 }
             )
         }
+    }
+
+    if (showDeleteDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteDialog = false },
+            title = { Text("Delete Entry") },
+            text = { Text("Are you sure you want to delete this diary entry? This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            try {
+                                storageService.delete(id)
+                                Toast.makeText(context, "Entry deleted", Toast.LENGTH_SHORT).show()
+                                showDeleteDialog = false
+                                navController.popBackStack()
+                            } catch (e: Exception) {
+                                Toast.makeText(context, "Error deleting entry", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Delete")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDeleteDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
     }
 
     var showDiscardDialog by remember { mutableStateOf(false) }

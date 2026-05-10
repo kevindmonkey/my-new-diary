@@ -1,27 +1,22 @@
 package ph.edu.cksc.college.appdev.mydiary.screens
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavHostController
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AboutScreen(navController: NavHostController) {
@@ -29,11 +24,11 @@ fun AboutScreen(navController: NavHostController) {
         topBar = {
             TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onSurface,
                 ),
                 title = {
-                    Text("App Dev Demo")
+                    Text("About", fontWeight = FontWeight.SemiBold)
                 },
                 navigationIcon = {
                     IconButton(onClick = {
@@ -55,7 +50,9 @@ fun AboutScreen(navController: NavHostController) {
 @Composable
 fun AboutScrollContent(innerPadding: PaddingValues) {
     Box(
-        modifier = Modifier.padding(innerPadding)
+        modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()
     ) {
         WebViewScreen()
     }
@@ -64,7 +61,6 @@ fun AboutScrollContent(innerPadding: PaddingValues) {
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun WebViewScreen() {
-
     AndroidView(
         factory = { context ->
             WebView(context).apply {
@@ -73,6 +69,7 @@ fun WebViewScreen() {
                 settings.loadWithOverviewMode = true
                 settings.useWideViewPort = true
                 settings.setSupportZoom(true)
+                setBackgroundColor(Color.TRANSPARENT)
             }
         },
         update = { webView ->

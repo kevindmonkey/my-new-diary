@@ -150,7 +150,8 @@ class MainActivity : ComponentActivity() {
                         try {
                             val entry = diaryEntry.value
                             if (entry.id.isBlank()) {
-                                storageService.save(entry)
+                                val newId = storageService.save(entry)
+                                diaryEntry.value = entry.copy(id = newId)
                             } else {
                                 storageService.update(entry)
                             }

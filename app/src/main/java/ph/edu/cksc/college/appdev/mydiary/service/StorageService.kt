@@ -156,8 +156,10 @@ class StorageService(val supabase: SupabaseClient) {
             voice_memo_urls = diaryEntry.voiceMemoUrls,
             view_count = 0
         )
-        supabase.from("entries").insert(serialEntry)
-        return ""
+        val response = supabase.from("entries").insert(serialEntry) {
+            select()
+        }.decodeSingle<EntryUpdate>()
+        return response.id
     }
 
     suspend fun update(diaryEntry: DiaryEntry) {

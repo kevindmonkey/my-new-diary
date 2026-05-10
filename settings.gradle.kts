@@ -16,6 +16,7 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        // This allows Android Studio to download the MPAndroidChart library
         maven { url = uri("https://jitpack.io") }
     }
 }
