@@ -2,6 +2,8 @@ package ph.edu.cksc.college.appdev.mydiary.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,6 +13,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -27,6 +31,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -38,6 +45,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import ph.edu.cksc.college.appdev.mydiary.LOGIN_SCREEN
 import ph.edu.cksc.college.appdev.mydiary.MAIN_SCREEN
+import ph.edu.cksc.college.appdev.mydiary.R
 import ph.edu.cksc.college.appdev.mydiary.REGISTRATION_SCREEN
 import ph.edu.cksc.college.appdev.mydiary.supabase
 
@@ -47,9 +55,10 @@ data class Profile (
     val email: String,
     @SerialName("full_name")  val fullName: String)
 
-fun getSettion(): String {
+fun getSession(): String {
     try {
         val session: UserSession? = supabase.auth.currentSessionOrNull()
+        // userSession is defined in LoginScreen.kt (same package)
         userSession = session
         return "Success"
     } catch (e: Exception) {
@@ -91,6 +100,17 @@ fun AccountScrollContent(innerPadding: PaddingValues, navController: NavHostCont
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        Image(
+            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = "App Icon",
+            modifier = Modifier
+                .size(100.dp)
+                .clip(CircleShape)
+                .background(Color(0xFF00B5FF))
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
             text = "My Diary",
             style = MaterialTheme.typography.displaySmall,
@@ -127,7 +147,7 @@ fun AccountScrollContent(innerPadding: PaddingValues, navController: NavHostCont
         Text(
             modifier = Modifier.clickable {
                 scope.launch {
-                    val result = getSettion()
+                    val result = getSession()
                     if (result == "Success") navController.navigate(MAIN_SCREEN)
                 }
             }.padding(8.dp),
