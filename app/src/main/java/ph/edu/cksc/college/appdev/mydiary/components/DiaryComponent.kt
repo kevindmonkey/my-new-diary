@@ -196,6 +196,21 @@ fun DiaryEntryCard(
     }
 }
 
+/**
+ * Utility to convert HTML string to plain text.
+ */
+fun fromHTML(content: String): String {
+    return content.replace("<br\\s*/?>".toRegex(), "\n")
+        .replace("<p>".toRegex(), "")
+        .replace("</p>".toRegex(), "\n\n")
+        .replace("<[^>]*>".toRegex(), "")
+        .replace("&lt;".toRegex(), "<")
+        .replace("&gt;".toRegex(), ">")
+        .replace("&amp;".toRegex(), "&")
+        .replace("&nbsp;".toRegex(), " ")
+        .trim()
+}
+
 fun parseHtmlToAnnotatedString(content: String): AnnotatedString {
     val cleanContent = content.replace("<br/?>".toRegex(), "\n")
         .replace("<p>".toRegex(), "")
